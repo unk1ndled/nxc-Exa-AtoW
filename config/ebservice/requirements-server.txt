@@ -1,0 +1,10 @@
+#fastapi[standard]>=0.115.8
+fastapi>=0.115.8
+uvicorn>=0.34.0
+uvloop>=0.21.0
+httptools>=0.6.4
+pydantic>=2.10.6
+Requests>=2.32.3
+SQLAlchemy>=2.0.38
+sqlmodel>=0.0.22
+PyYAML>=6.0.0
