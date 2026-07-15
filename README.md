@@ -61,13 +61,7 @@ frontend SSH are forwarded to the developer machine; the controller, compute
 nodes, and shared storage stay internal.
 
 ```console
-just check
-just install
-just build
-just up
 just test
-just tunnel
-just down
 ```
 
 With a VM deployment already running, `just tunnel` forwards the ebuffer API
