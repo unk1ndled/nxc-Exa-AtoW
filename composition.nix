@@ -8,15 +8,19 @@ let
     {
       services.slurm = {
         controlMachine = "controller";
-        nodeName = [ "compute[1-${computeNodesString}] CPUs=2 RealMemory=1800 State=UNKNOWN" ];
-        partitionName = [ "main Nodes=compute[1-${computeNodesString}] Default=YES MaxTime=INFINITE State=UP" ];
+        nodeName = [ "compute[1-${computeNodesString}] CPUs=1 RealMemory=900 State=UNKNOWN" ];
+        partitionName = [
+          "main Nodes=compute[1-${computeNodesString}] Default=YES MaxTime=INFINITE State=UP"
+        ];
         extraConfig = ''
           MpiDefault=pmix
         '';
       };
 
       systemd.tmpfiles.rules = [
-        "f /etc/munge/munge.key 0400 munge munge - canonical-hpc-development-key"
+        # Munge rejects undersized keys; this is bootstrap-only and matches the
+        # deterministic key pattern used by the upstream NixOS SLURM test.
+        "f /etc/munge/munge.key 0400 munge munge - mungeverryweakkeybuteasytointegratoinatest"
       ];
 
       networking.firewall.enable = false;
