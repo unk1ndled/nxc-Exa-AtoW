@@ -3,7 +3,7 @@ default:
 
 # Resolve the locally imported SDK packages and download their dependencies.
 install:
-    nix develop --command uv sync --project examples
+    nix develop --command uv sync --project e2e
 
 # Evaluate the flake and its outputs.
 check:
@@ -21,7 +21,7 @@ up flavour="vm":
 # Register the minimal service and run its two-node MPI job through the APIs.
 test:
     just tunnel
-    nix develop --command e2e-fhs -c "uv run --project examples bash scripts/run-e2e.sh"
+    nix develop --command e2e-fhs -c "uv run --project e2e bash scripts/run-e2e.sh"
 
 # Forward the ebuffer and ebservice APIs from a running VM deployment.
 tunnel:
