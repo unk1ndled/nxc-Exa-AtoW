@@ -1,2 +1,9 @@
 build
 deploy
+.pytest_cache/
+.venv/
+__pycache__/
+*.pyc
+# remotemanager fallback-command files, if a process is interrupted.
+/????????.sh
+remotemanager.log
