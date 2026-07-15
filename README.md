@@ -5,6 +5,9 @@ ebuffer server, ebservice, a SLURM frontend and controller, and two compute
 nodes. All roles share one network and are built with the same VM or Docker
 flavour.
 
+To integrate your own scientific application, follow the step-by-step
+[HPC-as-a-Service usage guide](Usage.md).
+
 HPC workloads are plug-ins rather than composition logic. Modules listed in
 `software/default.nix` are installed on the frontend and every compute node.
 The default `mpi-hello.nix` plug-in builds a small MPI program and composes the
@@ -100,9 +103,10 @@ sequenceDiagram
     Test-->>User: Print the successful result
 ```
 
-The E2E SDK environment is managed by uv. `just install` installs the imported
-`ebsclient_package` and `ebstemplate_package` trees as editable packages and
-downloads their Python dependencies into `examples/.venv`.
+The E2E SDK environment is managed by uv. Its Python script, configuration,
+project file, lockfile, and virtual environment all live under `e2e/`.
+`just install` downloads the published `ebsclient` and `ebstemplate` SDK
+packages into `e2e/.venv`.
 
 The default flavour is `vm`. Pass `docker` to a recipe, for example
 `just build docker`, to build the entire composition as containers.
