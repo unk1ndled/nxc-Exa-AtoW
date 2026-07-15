@@ -74,7 +74,7 @@ sequenceDiagram
     Controller->>C2: Start MPI rank 1
     C1-->>Frontend: Hello from rank 0
     C2-->>Frontend: Hello from rank 1
-    Frontend-->>Runtime: Job completed; mpi-hello.out available
+    Frontend-->>Runtime: Job completed, mpi-hello.out available
 
     Runtime->>Frontend: Fetch mpi-hello.out
     Runtime->>Buffer: Fill output ebuffer with returned bytes
