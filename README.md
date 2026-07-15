@@ -38,6 +38,55 @@ runtime through ebservice, submits the job through the client template, and
 requires both MPI ranks to finish through SLURM. Internal controller and
 compute-node ports remain on the composition network.
 
+## End-to-end sequence
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User
+    participant Client as minimal-e2e.py
+    participant Service as ebservice :8001
+    participant Buffer as ebuffer :8000
+    participant Runtime as RuntimeService
+    participant Frontend as SLURM frontend :2222
+    participant Controller as slurmctld
+    participant C1 as compute1
+    participant C2 as compute2
+
+    User->>Client: just test
+    Note over Client,Frontend: Loopback tunnels expose both APIs and frontend SSH
+    Client->>Service: Authenticate as bootstrap admin
+    Client->>Service: Register MPI microservice and compatible runtime
+    Client->>Buffer: Create scheduler-status ebuffer
+    Client->>Buffer: Create mpi-hello.out output ebuffer
+    Client->>Service: Submit job with output ebuffer UUID
+    Client->>Buffer: Tag scheduler ebuffer with job UUID
+
+    loop Poll for pending work
+        Runtime->>Service: List registered microservices and jobs
+    end
+    Service-->>Runtime: Pending MPI job
+    Runtime->>Service: Mark job RUNNING
+    Runtime->>Frontend: Upload scheduler script over SSH
+    Runtime->>Frontend: sbatch --wait scheduler_job.sh
+    Frontend->>Controller: Submit two-node job
+    Controller->>C1: Start MPI rank 0
+    Controller->>C2: Start MPI rank 1
+    C1-->>Frontend: Hello from rank 0
+    C2-->>Frontend: Hello from rank 1
+    Frontend-->>Runtime: Job completed; mpi-hello.out available
+
+    Runtime->>Frontend: Fetch mpi-hello.out
+    Runtime->>Buffer: Fill output ebuffer with returned bytes
+    Runtime->>Service: Mark job COMPLETED
+    Client->>Service: Read terminal job status
+    Client->>Buffer: Download mpi-hello.out by ebuffer UUID
+    Client->>Client: Verify rank 0 and rank 1
+    Client-->>User: Print ebuffer UUIDs, size, and output
+    Client->>Service: Delete job, runtime, and microservice
+    Client->>Buffer: Delete test ebuffers
+```
+
 The E2E SDK environment is managed by uv. `just install` installs the imported
 `ebsclient_package` and `ebstemplate_package` trees as editable packages and
 downloads their Python dependencies into `examples/.venv`.
