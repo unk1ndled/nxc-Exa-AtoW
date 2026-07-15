@@ -22,10 +22,28 @@ their network APIs (`ebuffer` and `ebservice` hostnames inside the composition).
 
 ```console
 just check
+just install
 just build
 just up
+just test
+just tunnel
 just down
 ```
 
+With a VM deployment already running, `just tunnel` forwards the ebuffer API
+to `http://localhost:8000/api/v1`, the ebservice API to
+`http://localhost:8001/api/v1`, and frontend SSH to `localhost:2222`. `just
+test` establishes those tunnels, registers a minimal MPI microservice and
+runtime through ebservice, submits the job through the client template, and
+requires both MPI ranks to finish through SLURM. Internal controller and
+compute-node ports remain on the composition network.
+
+The E2E SDK environment is managed by uv. `just install` installs the imported
+`ebsclient_package` and `ebstemplate_package` trees as editable packages and
+downloads their Python dependencies into `examples/.venv`.
+
 The default flavour is `vm`. Pass `docker` to a recipe, for example
 `just build docker`, to build the entire composition as containers.
+The VM start recipe defaults QEMU to `-cpu host`, which exposes the CPU
+instructions required by the nixpkgs OpenMPI/UCX build. Set `QEMU_OPTS`
+explicitly to override it.
