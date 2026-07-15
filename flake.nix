@@ -16,6 +16,21 @@
     }:
     let
       system = "x86_64-linux";
+      pkgs = import nixpkgs {
+        inherit system;
+        overlays = [ ebufferpkgs.overlays.default ];
+      };
+      e2eFhs = pkgs.buildFHSEnv {
+        name = "e2e-fhs";
+        targetPkgs = fhsPkgs: [
+          fhsPkgs.bash
+          fhsPkgs.coreutils
+          fhsPkgs.openssh
+          fhsPkgs.rsync
+          fhsPkgs.uv
+        ];
+        runScript = "bash";
+      };
       composed = nxc.lib.compose {
         inherit nixpkgs system;
         compositions = {
@@ -29,6 +44,13 @@
       packages.${system} = composed // {
         default = composed."hpc::vm";
       };
-      devShells.${system}.default = nxc.devShells.${system}.nxcShell;
+      devShells.${system}.default = pkgs.mkShell {
+        inputsFrom = [ nxc.devShells.${system}.nxcShell ];
+        packages = [
+          e2eFhs
+          pkgs.jq
+          pkgs.uv
+        ];
+      };
     };
 }
