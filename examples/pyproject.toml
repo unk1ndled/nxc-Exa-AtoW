@@ -1,0 +1,19 @@
+[project]
+name = "nxc-exa-atow-e2e"
+version = "0.1.0"
+description = "Host-side E2E test for the NixOS Compose HPC topology"
+requires-python = ">=3.12"
+dependencies = [
+  "ebsclient",
+  "ebstemplate",
+]
+
+[tool.uv.sources]
+ebsclient = { path = "../ebsclient_package", editable = true }
+ebstemplate = { path = "../ebstemplate_package", editable = true }
+
+[tool.uv]
+package = false
+
+[dependency-groups]
+dev = ["pytest>=9"]
