@@ -40,51 +40,30 @@ compute-node ports remain on the composition network.
 
 ## End-to-end sequence
 
+At a high level, the test sends a job through the APIs, runs it on the cluster,
+stores its result in ebuffer, and downloads that result for verification.
+
 ```mermaid
 sequenceDiagram
     autonumber
     actor User
-    participant Client as minimal-e2e.py
-    participant Service as ebservice :8001
-    participant Buffer as ebuffer :8000
-    participant Runtime as RuntimeService
-    participant Frontend as SLURM frontend :2222
-    participant Controller as slurmctld
-    participant C1 as compute1
-    participant C2 as compute2
+    participant Test as E2E test
+    participant API as ebservice
+    participant Data as ebuffer
+    participant Worker as Runtime worker
+    participant Cluster as SLURM cluster
 
-    User->>Client: just test
-    Note over Client,Frontend: Loopback tunnels expose both APIs and frontend SSH
-    Client->>Service: Authenticate as bootstrap admin
-    Client->>Service: Register MPI microservice and compatible runtime
-    Client->>Buffer: Create scheduler-status ebuffer
-    Client->>Buffer: Create mpi-hello.out output ebuffer
-    Client->>Service: Submit job with output ebuffer UUID
-    Client->>Buffer: Tag scheduler ebuffer with job UUID
-
-    loop Poll for pending work
-        Runtime->>Service: List registered microservices and jobs
-    end
-    Service-->>Runtime: Pending MPI job
-    Runtime->>Service: Mark job RUNNING
-    Runtime->>Frontend: Upload scheduler script over SSH
-    Runtime->>Frontend: sbatch --wait scheduler_job.sh
-    Frontend->>Controller: Submit two-node job
-    Controller->>C1: Start MPI rank 0
-    Controller->>C2: Start MPI rank 1
-    C1-->>Frontend: Hello from rank 0
-    C2-->>Frontend: Hello from rank 1
-    Frontend-->>Runtime: Job completed, mpi-hello.out available
-
-    Runtime->>Frontend: Fetch mpi-hello.out
-    Runtime->>Buffer: Fill output ebuffer with returned bytes
-    Runtime->>Service: Mark job COMPLETED
-    Client->>Service: Read terminal job status
-    Client->>Buffer: Download mpi-hello.out by ebuffer UUID
-    Client->>Client: Verify rank 0 and rank 1
-    Client-->>User: Print ebuffer UUIDs, size, and output
-    Client->>Service: Delete job, runtime, and microservice
-    Client->>Buffer: Delete test ebuffers
+    User->>Test: Run just test
+    Test->>API: Register the MPI service and submit a job
+    Test->>Data: Create space for the job output
+    Worker->>API: Pick up the waiting job
+    Worker->>Cluster: Run one MPI task on each compute node
+    Cluster-->>Worker: Return mpi-hello.out with both ranks
+    Worker->>Data: Upload mpi-hello.out
+    Worker->>API: Mark the job completed
+    Test->>Data: Download mpi-hello.out
+    Test->>Test: Check that rank 0 and rank 1 are present
+    Test-->>User: Print the successful result
 ```
 
 The E2E SDK environment is managed by uv. `just install` installs the imported
