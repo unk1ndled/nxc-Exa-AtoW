@@ -106,40 +106,29 @@ wheels = [
 [[package]]
 name = "ebsclient"
 version = "0.2.0"
-source = { editable = "../ebsclient_package" }
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "ebcommon" },
     { name = "requests" },
 ]
-
-[package.metadata]
-requires-dist = [
-    { name = "ebcommon", specifier = ">=1.0.0" },
-    { name = "pytest", marker = "extra == 'dev'", specifier = ">=7.0" },
-    { name = "pytest-cov", marker = "extra == 'dev'" },
-    { name = "requests" },
+sdist = { url = "https://files.pythonhosted.org/packages/65/a3/0fbbb22918a26b7c0f756037d480eef1a4b7c63e585dadedccfceb155381/ebsclient-0.2.0.tar.gz", hash = "sha256:d7a5c59dc1b59c340f1415e96e2ed07aac6dc7fa71c9536bfc9fd0365ac74ded", size = 30129, upload-time = "2026-07-08T15:22:43.577Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/82/90/d6ef01c9e8e16bcec81181c95c9d5bedf34ff57fddea1a7abb81b11e36b3/ebsclient-0.2.0-py3-none-any.whl", hash = "sha256:f6289971ef220ee61777bf1f12ce414cfcba52b0e6d309b93ed9d8ec5c34b24d", size = 45259, upload-time = "2026-07-08T15:22:42.197Z" },
 ]
-provides-extras = ["dev"]
 
 [[package]]
 name = "ebstemplate"
 version = "0.2.0"
-source = { editable = "../ebstemplate_package" }
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "ebcommon" },
     { name = "remotemanager" },
     { name = "requests" },
 ]
-
-[package.metadata]
-requires-dist = [
-    { name = "ebcommon", specifier = ">=1.0.0" },
-    { name = "pytest", marker = "extra == 'dev'", specifier = ">=7.0" },
-    { name = "pytest-cov", marker = "extra == 'dev'" },
-    { name = "remotemanager", specifier = "<=0.14.3" },
-    { name = "requests" },
+sdist = { url = "https://files.pythonhosted.org/packages/b6/d0/3b1518af1ce9be338094d8f0565bd1a74a81cfc2b129fc58d8fd58d14049/ebstemplate-0.2.0.tar.gz", hash = "sha256:83704b88d7744eec9d58b55df91d6aa84b6682667930f04ef764adfc03b58611", size = 20742, upload-time = "2026-07-08T15:23:36.416Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e4/45/5b3889702a4d0009d5ef552714f3488f3bd085f3ceb55bc76a3e447b2fc4/ebstemplate-0.2.0-py3-none-any.whl", hash = "sha256:28afa2d5bc4c51b481b3b833dc8e4b36c4ec2e0715d4e51cee8efbc93ebf8f14", size = 25467, upload-time = "2026-07-08T15:23:35.305Z" },
 ]
-provides-extras = ["dev"]
 
 [[package]]
 name = "idna"
@@ -175,8 +164,8 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "ebsclient", editable = "../ebsclient_package" },
-    { name = "ebstemplate", editable = "../ebstemplate_package" },
+    { name = "ebsclient", specifier = ">=0.1.1" },
+    { name = "ebstemplate", specifier = ">=0.1.1" },
 ]
 
 [package.metadata.requires-dev]
