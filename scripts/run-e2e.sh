@@ -12,9 +12,9 @@ fi
 if [[ "$identity_file" != "$HOME/.ssh/id_rsa" ]]; then
   temporary_config=$(mktemp)
   trap 'rm -f "$temporary_config"' EXIT
-  sed "s|~/.ssh/id_rsa|$identity_file|" examples/minimal-hpc.ini >"$temporary_config"
+  sed "s|~/.ssh/id_rsa|$identity_file|" e2e/minimal-hpc.ini >"$temporary_config"
   export E2E_HPC_CONFIG=$temporary_config
 fi
 
-cd examples
+cd e2e
 python minimal-e2e.py
