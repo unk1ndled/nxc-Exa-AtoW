@@ -20,6 +20,46 @@ The ebuffer and ebservice roles contain no workload-specific policy. Their
 files under `config/` are bootstrap settings; clients use the services through
 their network APIs (`ebuffer` and `ebservice` hostnames inside the composition).
 
+## Architecture
+
+```mermaid
+flowchart LR
+    subgraph Host[Developer machine]
+        Client[E2E client]
+        Runtime[Runtime worker]
+    end
+
+    subgraph APIs[EB API layer]
+        Service[ebservice<br/>Jobs and runtimes]
+        Buffer[ebuffer<br/>Input and output data]
+    end
+
+    subgraph SLURM[SLURM cluster]
+        Frontend[Frontend<br/>Job submission]
+        Controller[Controller<br/>Scheduling]
+        Compute1[Compute 1<br/>MPI rank 0]
+        Compute2[Compute 2<br/>MPI rank 1]
+        Users[Shared /users storage]
+
+        Frontend -->|Submit job| Controller
+        Controller -->|Start task| Compute1
+        Controller -->|Start task| Compute2
+        Frontend --- Users
+        Compute1 --- Users
+        Compute2 --- Users
+    end
+
+    Client -->|Register and submit| Service
+    Client <-->|Upload and download| Buffer
+    Runtime -->|Poll jobs and report status| Service
+    Runtime -->|Read and fill buffers| Buffer
+    Runtime -->|SSH tunnel| Frontend
+```
+
+All six VM nodes share the private NXC network. Only the two HTTP APIs and
+frontend SSH are forwarded to the developer machine; the controller, compute
+nodes, and shared storage stay internal.
+
 ```console
 just check
 just install
