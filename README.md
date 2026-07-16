@@ -123,3 +123,5 @@ full scheduler monitoring/accounting, large transfers, non-VM flavours,
 portable CPU emulation, failure recovery, or concurrent multi-user behavior.
 Those are the main places to remove shortcuts if this topology grows beyond a
 minimal local integration test.
+
+see [here](DevNotes.md) for more insights on the "hacks" that were needed to make this work.
