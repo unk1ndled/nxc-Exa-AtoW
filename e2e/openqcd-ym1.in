@@ -1,0 +1,34 @@
+[Run name]
+name         openqcd-e2e
+
+[Log directories]
+log_dir      .
+dat_dir      .
+
+[Configurations]
+types        e
+cnfg_dir     .
+
+[Lattice parameters]
+beta         6.00
+c0           1.0
+
+[Boundary conditions]
+type         3
+
+[Random number generator]
+level        0
+seed         73099
+
+[Trajectory length]
+tau          0.1
+
+[MD integrator]
+integrator   LPFR
+nstep        1
+
+[MD trajectories]
+nth          1
+ntr          1
+dtr_log      1
+dtr_cnfg     1
