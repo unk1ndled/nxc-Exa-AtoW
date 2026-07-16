@@ -103,13 +103,23 @@ sequenceDiagram
     Test-->>User: Print the successful result
 ```
 
-The E2E SDK environment is managed by uv. Its Python script, configuration,
-project file, lockfile, and virtual environment all live under `e2e/`.
-`just install` downloads the published `ebsclient` and `ebstemplate` SDK
-packages into `e2e/.venv`.
+The default flavour is `vm`.
 
-The default flavour is `vm`. Pass `docker` to a recipe, for example
-`just build docker`, to build the entire composition as containers.
-The VM start recipe defaults QEMU to `-cpu host`, which exposes the CPU
-instructions required by the nixpkgs OpenMPI/UCX build. Set `QEMU_OPTS`
-explicitly to override it.
+## What this test proves—and what it does not
+
+It does prove the current local path:
+
+1. authenticate with ebservice;
+2. register a microservice and compatible runtime;
+3. create scheduler and output ebuffers;
+4. let the runtime pick up the API-submitted job;
+5. submit a two-node SLURM job through the frontend;
+6. run one MPI rank on each compute VM;
+7. upload the result into ebuffer;
+8. download it through the client API and verify both ranks.
+
+It does not prove production security, persistent storage, normal remote SCP,
+full scheduler monitoring/accounting, large transfers, non-VM flavours,
+portable CPU emulation, failure recovery, or concurrent multi-user behavior.
+Those are the main places to remove shortcuts if this topology grows beyond a
+minimal local integration test.
