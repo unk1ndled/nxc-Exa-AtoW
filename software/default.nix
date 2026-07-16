@@ -1,8 +1,6 @@
-{ ... }:
 {
-  # Each imported module is an HPC software plug-in. Add or remove modules here;
-  # they are applied identically to the frontend and every compute node.
-  imports = [
-    ./mpi-hello.nix
-  ];
+  # The key becomes the NXC composition name. Each module is installed on the
+  # frontend and compute roles only when its composition is selected.
+  mpi-hello = ./mpi-hello.nix;
+  openqcd = ./openqcd.nix;
 }
