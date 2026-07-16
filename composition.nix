@@ -1,3 +1,8 @@
+{
+  frontendModules ? [ ],
+  computeModules ? [ ],
+  testScript ? "",
+}:
 { pkgs, ... }:
 let
   computeNodes = 2;
@@ -66,10 +71,7 @@ in
     frontend =
       { ... }:
       {
-        imports = [
-          clusterBase
-          ./software
-        ];
+        imports = [ clusterBase ] ++ frontendModules;
         services.slurm.enableStools = true;
         nxc.sharedDirs."/users".server = "controller";
       };
@@ -85,31 +87,12 @@ in
     compute =
       { ... }:
       {
-        imports = [
-          clusterBase
-          ./software
-        ];
+        imports = [ clusterBase ] ++ computeModules;
         services.slurm.client.enable = true;
         nxc.sharedDirs."/users".server = "controller";
       };
   };
 
   rolesDistribution.compute = computeNodes;
-
-  testScript = ''
-    ebuffer.wait_for_unit("ebuffer.service")
-    ebservice.wait_for_unit("ebservice.service")
-    ebservice.succeed("eb-login")
-    controller.wait_for_unit("slurmctld.service")
-    compute1.wait_for_unit("slurmd.service")
-    compute2.wait_for_unit("slurmd.service")
-    frontend.succeed(
-      "su - user1 -c 'cd /users/user1 && "
-      "sbatch --wait --nodes=2 --ntasks=2 --ntasks-per-node=1 "
-      "--output=mpi-hello.out --wrap=\"srun --mpi=pmix mpi-hello\"'"
-    )
-    frontend.succeed("test $(grep -c 'Hello from rank' /users/user1/mpi-hello.out) -eq 2")
-    frontend.succeed("grep -q 'rank 0 of 2' /users/user1/mpi-hello.out")
-    frontend.succeed("grep -q 'rank 1 of 2' /users/user1/mpi-hello.out")
-  '';
+  inherit testScript;
 }

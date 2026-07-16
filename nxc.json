@@ -1,4 +1,5 @@
 {
-  "composition": "composition.nix",
-  "default_flavour": "vm"
+  "composition": "compositions.nix",
+  "default_flavour": "vm",
+  "flake": true
 }

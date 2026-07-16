@@ -33,16 +33,14 @@
       };
       composed = nxc.lib.compose {
         inherit nixpkgs system;
-        compositions = {
-          hpc = import ./composition.nix;
-        };
+        compositions = import ./compositions.nix;
         overlays = [ ebufferpkgs.overlays.default ];
         extraConfigurations = [ ebufferpkgs.nixosModules.default ];
       };
     in
     {
       packages.${system} = composed // {
-        default = composed."hpc::vm";
+        default = composed."openqcd::vm";
       };
       devShells.${system}.default = pkgs.mkShell {
         inputsFrom = [ nxc.devShells.${system}.nxcShell ];
