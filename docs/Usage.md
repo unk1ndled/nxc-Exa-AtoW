@@ -1,20 +1,26 @@
 # Plugging Scientific Software into the HPC-as-a-Service Stack
 
-This guide explains how to replace the tiny `mpi-hello` workload with your own
-scientific application. The goal is to make the application available on the
-compute nodes, describe it to ebservice, run it through SLURM, and move its
-input and output files through ebuffer.
+This guide uses the repository's OpenQCD 2.0 `ym1` workload as a concrete
+example for integrating your own scientific application. The goal is to make
+the application available on the compute nodes, describe it to ebservice, run
+it through SLURM, and move its input and output files through ebuffer.
 
-The integration has two distinct parts:
+The repository separates integration into three layers:
 
-1. **Cluster installation:** package the executable with Nix and install it on
-   the frontend and compute nodes.
-2. **Service integration:** describe the application inputs and outputs, then
-   implement the small scheduler adapter that builds its SLURM command.
+1. **Shared infrastructure:** `composition.nix` builds the ebuffer, ebservice,
+   shared-storage, and SLURM roles from injected workload and test modules. It
+   contains no application policy.
+2. **Workload software:** `software/default.nix` catalogs the NixOS module to
+   install for each composition name.
+3. **Validation:** `e2e/nxc/` supplies common readiness plus app-specific NXC
+   tests, while `e2e/common.py` runs app contracts through the shared host-side
+   API, SSH, scheduler, transfer, and cleanup lifecycle.
 
-Keep those parts separate. Application packages belong in `software/`; API and
-workflow code belongs in your own client/runtime project or, for a local proof
-of concept, under `e2e/`.
+`compositions.nix` joins the software and NXC-test catalogs and requires their
+keys to match. The maintained keys are `openqcd` and `mpi-hello`; `openqcd` is
+the command-line and flake default. Keep application packages in `software/`
+and application contracts in app-specific E2E modules rather than adding them
+to the shared infrastructure or lifecycle code.
 
 ## 1. Decide the application contract
 
@@ -36,6 +42,21 @@ Its service contract could be:
 Use arguments for small scalar values and ebuffers for files or binary data.
 Every name is positional: the runtime receives values in the same order used
 by `argument_names`, `ebin_names`, and `ebout_names`.
+
+The maintained OpenQCD E2E has this deliberately small contract:
+
+| Kind | Name | Purpose |
+| --- | --- | --- |
+| Input ebuffer | `openqcd-ym1.in` | Configure one small HMC trajectory |
+| Output ebuffer | `openqcd-e2e.log` | Return the scientific run log |
+
+It has no scalar arguments. The runtime stages the maintained
+`e2e/openqcd-ym1.in`, launches `ym1`, and returns only the log; transient or
+large binary configuration data is outside this topology smoke test.
+
+The `mpi-hello` contract has no input ebuffer. It returns `mpi-hello.out` and
+checks that ranks 0 and 1 ran on two distinct compute hosts. It is useful as a
+fast topology diagnostic before integrating a larger application.
 
 ## 2. Package the application with Nix
 
@@ -74,38 +95,73 @@ phase to the real project. Prefer an existing nixpkgs package when one exists:
 }
 ```
 
-Import the module from `software/default.nix`:
+The current flake follows that pattern for both maintained workloads.
+`software/mpi-hello.nix` compiles the small C source with OpenMPI.
+`software/openqcd.nix` exposes the locked overlay package's `app/ym1`
+executable as `bin/ym1`, composes OpenMPI, and reduces OpenQCD's compile-time
+local lattice to the valid `4x4x4x4` minimum without changing its two-rank
+process grid. No upstream OpenQCD source is copied into this repository.
+
+Register the module in the software catalog. The key is the public workload
+and NXC composition name:
 
 ```nix
 {
-  imports = [
-    ./openmpi.nix
-    ./my-solver.nix
-  ];
+  mpi-hello = ./mpi-hello.nix;
+  my-solver = ./my-solver.nix;
+  openqcd = ./openqcd.nix;
 }
 ```
 
-Modules imported there are installed consistently on the frontend and compute
-roles. Do not install workload software on ebuffer or ebservice.
+The selected module is installed consistently on the frontend and compute
+roles; unselected workload executables are absent. Do not install workload
+software on ebuffer or ebservice.
+
+Add a matching `e2e/nxc/my-solver.nix` plug-in and catalog entry. The NXC
+plug-in provides a frontend fixture module and app-specific assertions; common
+service, login, controller, and compute readiness comes from
+`e2e/nxc/common.nix`. A missing or extra catalog key makes composition
+evaluation fail instead of silently building an untested workload.
+
+For the host E2E, create `e2e/my_solver_e2e.py` exporting an
+`E2EApplication`. Its contract selects the job INI, input and output names,
+scheduler core, diagnostics, timeout, and scientific validation. Register it
+in the `APPLICATIONS` mapping in `e2e/minimal-e2e.py`; keep connection,
+polling, transfer, diagnostics, and cleanup behavior in `e2e/common.py`.
 
 Build before touching the API layer:
 
 ```bash
 just check
-just build
+just build vm my-solver
 ```
 
 After starting the topology, confirm the executable is visible from the
 frontend and under SLURM:
 
 ```bash
-just up
-just tunnel
+just up vm my-solver
+just tunnel my-solver
 ssh -p 2222 root@localhost 'command -v my-solver'
 ```
 
 Also submit a direct batch job first. This isolates packaging, shared-storage,
 and scheduler problems from API problems.
+
+For a checkout on storage visible to the SLURM nodes, submit the example that
+matches the running composition:
+
+```bash
+# With the OpenQCD composition:
+sbatch examples/openqcd-ym1.sbatch
+
+# With the MPI hello composition:
+sbatch examples/mpi-hello.sbatch
+```
+
+The OpenQCD script accepts another input path as its first argument. That input
+must retain the `openqcd-e2e` run name if the example's final log check should
+use the same output filename.
 
 ## 3. Describe the microservice
 
@@ -157,14 +213,23 @@ Subclass `JobSchedulerTemplate`. For many applications, the only required
 method is `get_scheduler_core()`:
 
 ```python
+import shlex
+
+from ebsclient import RuntimeJobError
 from ebstemplate.scheduler import JobSchedulerTemplate
 
 
 class MySolverJob(JobSchedulerTemplate):
     def get_scheduler_core(self) -> str:
-        iterations = self.job.arguments[0]
-        input_file = self.job_dir / "model.in"
-        output_file = self.job_dir / "result.dat"
+        try:
+            iterations = int(self.job.arguments[0])
+        except (TypeError, ValueError) as error:
+            raise RuntimeJobError("iterations must be an integer") from error
+        if not 1 <= iterations <= 100_000:
+            raise RuntimeJobError("iterations must be between 1 and 100000")
+
+        input_file = shlex.quote(str(self.job_dir / "model.in"))
+        output_file = shlex.quote(str(self.job_dir / "result.dat"))
         return (
             f"srun my-solver "
             f"--iterations {iterations} "
@@ -190,8 +255,9 @@ insufficient.
 
 ## 6. Configure the HPC connection and job resources
 
-The runtime needs one HPC INI and one job INI. Start from
-`e2e/minimal-hpc.ini` and `e2e/minimal-job.ini`.
+The runtime needs one HPC INI and one app-specific job INI. Start from the
+shared `e2e/minimal-hpc.ini` and either `e2e/openqcd-job.ini` or
+`e2e/mpi-hello-job.ini`.
 
 The HPC file defines the scheduler profile, SSH target, command names, and
 timeouts. The job file defines application directories and SLURM resources:
@@ -202,7 +268,7 @@ job_name = my-solver
 
 [INSTALLATION]
 app_name = my-solver
-app_dir = /users/user1
+app_dir = /run/current-system/sw/bin
 run_dir = /users/user1
 
 [RESOURCES]
@@ -219,7 +285,10 @@ modules =
 
 The local VMs currently expose one SLURM CPU and 900 MB per compute node. Do
 not request more than the topology declares. Real deployments should provide
-their own resource profile instead of copying these development values.
+their own resource profile instead of copying these development values. For
+the shipped OpenQCD 2.0 build, `tasks = 2` is not just a resource preference:
+it must match the executable's compile-time `2x1x1x1` process grid. The example
+places one of those ranks on each compute node.
 
 ## 7. Start the runtime worker
 
@@ -240,11 +309,13 @@ service = RuntimeService(
 service.start()
 ```
 
-For local VM development, review `e2e/minimal-e2e.py`. It contains narrowly
-scoped compatibility code for NXC's forwarded SSH port and NixOS's lack of
-`/bin/bash`. Keep those workarounds out of reusable scientific application
-logic. A real deployment should use its normal reachable HPC hostname and SSH
-configuration.
+For local VM development, review `e2e/common.py` and the two maintained
+contracts, `e2e/mpi_hello_e2e.py` and `e2e/openqcd_e2e.py`.
+`minimal-e2e.py` only validates the selected catalog name and dispatches its
+contract. The common module contains narrowly scoped compatibility code for
+NXC's forwarded SSH port and NixOS's lack of `/bin/bash`. Keep those
+workarounds out of application contracts. A real deployment should use its
+normal reachable HPC hostname and SSH configuration.
 
 ## 8. Submit from the client side
 
@@ -269,8 +340,8 @@ download the output and validate its contents, format, or checksum.
 
 ## 9. Turn the example into a real test
 
-Copy the structure of `e2e/minimal-e2e.py`, not necessarily all its
-workarounds. A useful application E2E should verify:
+Copy the structure of an app-specific contract, not the shared lifecycle or
+its compatibility workarounds. A useful application E2E should verify:
 
 - authentication succeeds;
 - the microservice and runtime are registered;
@@ -284,6 +355,13 @@ workarounds. A useful application E2E should verify:
 
 Use unique tags and names for tests so leaked resources can be identified and
 removed safely.
+
+The OpenQCD contract uploads its input through an input ebuffer and downloads
+`openqcd-e2e.log` through an output ebuffer. It checks the local and global
+lattices, the two-rank process grid, exactly one completed trajectory,
+configuration export, and a finite plaquette without relying on a
+CPU-specific golden value. The MPI hello contract downloads `mpi-hello.out`
+and verifies exactly two ranks and two distinct compute hosts.
 
 ## Recommended development order
 
@@ -302,22 +380,45 @@ behavior at the same time.
 
 ## Local workflow
 
+The default workload is OpenQCD. The flavour is the first optional argument to
+`build`, `up`, and `down`; the workload is second:
+
 ```bash
 just install
-just up
+just up                         # openqcd::vm
+just up vm mpi-hello            # mpi-hello::vm
 ```
 
-In another terminal:
+Run only one of those deployments for a given host E2E. In another terminal,
+select the matching contract:
 
 ```bash
-just test
+just test                       # OpenQCD
+just test mpi-hello
 ```
 
-When finished:
+The in-topology tests do not require a separately running deployment:
 
 ```bash
-just down
+just nxc-test
+just nxc-test mpi-hello
 ```
 
-The shipped E2E remains intentionally small. Read [Notes.md](Notes.md) before
-using its compatibility shortcuts as a design for a production service.
+When finished with a VM, return to the terminal running `just up` and press
+Ctrl-C. The pinned NXC release has no standalone `VmFlavour.cleanup()` method,
+so `just down vm ...` currently fails. Flavours that implement cleanup can use
+the recipe normally:
+
+```bash
+just down docker
+just down docker mpi-hello
+```
+
+`just tunnel [workload]` and `just test [workload]` use fixed localhost ports
+8000, 8001, and 2222. Only one composition can be exposed at a time; selecting
+the other workload automatically closes this repository's managed SSH masters
+and establishes tunnels to the requested deployment.
+
+The shipped E2E remains intentionally small. Read
+[the development notes](DevNotes.md) before using its compatibility shortcuts
+as a design for a production service.
