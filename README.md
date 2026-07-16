@@ -6,7 +6,7 @@ nodes. All roles share one network and are built with the same VM or Docker
 flavour.
 
 To integrate your own scientific application, follow the step-by-step
-[HPC-as-a-Service usage guide](Usage.md).
+[HPC-as-a-Service usage guide](docs/Usage.md).
 
 HPC workloads are plug-ins rather than composition logic. Modules listed in
 `software/default.nix` are installed on the frontend and every compute node.
@@ -124,4 +124,4 @@ portable CPU emulation, failure recovery, or concurrent multi-user behavior.
 Those are the main places to remove shortcuts if this topology grows beyond a
 minimal local integration test.
 
-see [here](DevNotes.md) for more insights on the "hacks" that were needed to make this work.
+see [here](docs/DevNotes.md) for more insights on the "hacks" that were needed to make this work.
