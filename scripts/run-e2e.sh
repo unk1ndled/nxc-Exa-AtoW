@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-identity_file=${NXC_IDENTITY_FILE:-$HOME/.ssh/id_rsa}
+workload="${1:-openqcd}"
+repository_root=$(realpath "$(dirname "${BASH_SOURCE[0]}")/..")
+identity_file=$(realpath "${NXC_IDENTITY_FILE:-$HOME/.ssh/id_rsa}")
 export NXC_IDENTITY_FILE=$identity_file
 
 if [[ ! -f "$identity_file" ]]; then
@@ -9,12 +11,10 @@ if [[ ! -f "$identity_file" ]]; then
   exit 1
 fi
 
-if [[ "$identity_file" != "$HOME/.ssh/id_rsa" ]]; then
-  temporary_config=$(mktemp)
-  trap 'rm -f "$temporary_config"' EXIT
-  sed "s|~/.ssh/id_rsa|$identity_file|" e2e/minimal-hpc.ini >"$temporary_config"
-  export E2E_HPC_CONFIG=$temporary_config
+if [[ -n ${E2E_HPC_CONFIG:-} ]]; then
+  E2E_HPC_CONFIG=$(realpath "$E2E_HPC_CONFIG")
+  export E2E_HPC_CONFIG
 fi
 
-cd e2e
-python minimal-e2e.py
+cd "$repository_root/e2e"
+python minimal-e2e.py --app "$workload"
