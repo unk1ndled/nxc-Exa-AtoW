@@ -9,6 +9,14 @@ install:
 check:
     nix flake check
 
+# Build the mdBook documentation into docs/book.
+docs:
+    nix develop --command mdbook build
+
+# Serve the mdBook documentation with live reload.
+docs-serve hostname="127.0.0.1" port="3000":
+    nix develop --command mdbook serve --hostname "{{ hostname }}" --port "{{ port }}"
+
 # Build one workload composition. The flavour stays first for `just build docker` compatibility.
 build flavour="vm" workload="openqcd":
     nix develop --command nxc build -f "{{ flavour }}" -C "{{ workload }}::{{ flavour }}"
