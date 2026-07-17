@@ -1,0 +1,23 @@
+[book]
+title = "Reproducible HPC-as-a-Service with NixOS Compose"
+authors = ["unk1ndled"]
+description = "Architecture and tutorials for the Exa-AToW NixOS Compose demonstrator"
+language = "en"
+multilingual = false
+src = "docs"
+
+[build]
+build-dir = "docs/book"
+create-missing = false
+
+[output.html]
+additional-css = ["docs/theme/custom.css"]
+default-theme = "light"
+preferred-dark-theme = "navy"
+git-repository-url = "https://github.com/unk1ndled/nxc-Exa-AtoW"
+git-repository-icon = "fa-github"
+edit-url-template = "https://github.com/unk1ndled/nxc-Exa-AtoW/edit/main/{path}"
+
+[output.html.fold]
+enable = true
+level = 1

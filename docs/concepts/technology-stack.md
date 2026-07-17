@@ -1,0 +1,48 @@
+# Technology stack
+
+The stack combines tools from several communities. Similar-sounding concepts
+have deliberately different jobs.
+
+| Technology | Role here | Start reading |
+| --- | --- | --- |
+| Nix | Pins dependencies and builds packages as immutable store paths. | [How Nix works](https://nixos.org/guides/how-nix-works/) |
+| NixOS | Declares packages, users, services, filesystems, and networking for each node. | [NixOS manual](https://nixos.org/manual/nixos/stable/) |
+| NixOS Compose (NXC) | Builds and launches a distributed set of NixOS roles using a selected flavour such as QEMU VMs or Docker. | [NXC documentation](https://nixos-compose.gitlabpages.inria.fr/nixos-compose/) |
+| ebuffer | Provides ephemeral input and output buffers through an API. | [Exa-AToW package repository](https://gricad-gitlab.univ-grenoble-alpes.fr/exa-atow/ebuffer-nix-pkgs) |
+| ebservice | Stores application, runtime, and pipeline-job control objects. | [ebsclient on PyPI](https://pypi.org/project/ebsclient/) |
+| SLURM | Allocates nodes, queues jobs, launches steps, and reports scheduler state. | [SLURM quick start](https://slurm.schedmd.com/quickstart.html) |
+| Open MPI | Implements the MPI communication model used by both workloads. | [Open MPI documentation](https://docs.open-mpi.org/en/main/) |
+| PMIx | Connects the scheduler's process launch to the MPI runtime. | [SLURM MPI guide](https://slurm.schedmd.com/mpi_guide.html) |
+| OpenQCD | Supplies the real lattice-QCD `ym1` application used by the scientific smoke test. | [OpenQCD project](https://luscher.web.cern.ch/luscher/openQCD/) |
+
+
+## SLURM, MPI, and PMIx
+
+These are complementary:
+
+- SLURM decides *where and when* tasks may run.
+- MPI defines *how application ranks communicate*.
+- PMIx supplies process-management information during launch.
+
+The topology sets `MpiDefault=pmix`, and the example batch scripts are
+explicit:
+
+```console
+srun --mpi=pmix --nodes=2 --ntasks=2 --ntasks-per-node=1 mpi-hello
+```
+
+The selected Open MPI package is installed on the frontend and both compute
+nodes. VM transport is constrained to TCP and self transports for predictable
+local behavior.
+
+## Two kinds of storage
+
+Do not confuse the two data mechanisms:
+
+- ebuffer is an API-visible, ephemeral envelope used before and after the
+  scheduler job;
+- `/users` is shared storage mounted by the frontend and compute nodes while
+  the scheduler job runs.
+
+The runtime bridges them by materializing ebuffer bytes in a per-job
+directory, then uploading a result from that directory into an output buffer.
