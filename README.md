@@ -11,7 +11,22 @@ and two compute nodes. Only the selected workload is installed on the frontend
 and compute roles.
 
 To integrate another application, follow the step-by-step
-[HPC-as-a-Service usage guide](docs/Usage.md).
+[mdBook tutorial](docs/tutorials/add-workload.md).
+
+## Documentation
+
+The repository includes a full mdBook with separate concepts, architecture,
+tutorial, and reference sections:
+
+```console
+just docs
+just docs-serve
+```
+
+The generated site is written to `book/`; the live server defaults to
+`http://127.0.0.1:3000`. Start at the
+[book introduction](docs/README.md) or browse its
+[table of contents](docs/SUMMARY.md).
 
 ## Repository layers
 
