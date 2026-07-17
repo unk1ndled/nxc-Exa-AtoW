@@ -36,8 +36,7 @@ token, never a login, key, or mount on a facility it does not manage.
 
 
 The runtime worker is the only party that ever moves bytes between an ebuffer
-and the shared `/users` job directory. See [Control, data, and execution
-flows](../architecture/flows.md) for the exact sequence.
+and the shared `/users` job directory. 
 
 Do not confuse an ebuffer with `/users`:
 
@@ -105,6 +104,4 @@ Each composition runs one `ebservice` role, reachable at
 `http://127.0.0.1:8001/api/v1` once tunneled. The host-local `RuntimeService`
 polls it for compatible pipeline jobs, connects to the frontend over SSH with
 its own key, submits with `sbatch --parsable`, and mirrors observed scheduler
-state into a status ebuffer as it polls `scontrol show job`. See [Control,
-data, and execution flows](../architecture/flows.md) for the full sequence,
-including cleanup.
+state into a status ebuffer as it polls `scontrol show job`.
