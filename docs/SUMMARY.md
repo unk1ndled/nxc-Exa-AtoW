@@ -5,8 +5,8 @@
 # Concepts
 
 - [Where this fits in Exa-AToW](concepts/exa-atow.md)
-- [The HPC-as-a-Service mental model](concepts/hpc-as-a-service.md)
 - [Repository architecture](concepts/monorepo.md)
+- [The HPC-as-a-Service mental model](concepts/hpc-as-a-service.md)
 
 # Stack
 - [Technology stack](stack/technology-stack.md)
