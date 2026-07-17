@@ -11,7 +11,7 @@ and two compute nodes. Only the selected workload is installed on the frontend
 and compute roles.
 
 To integrate another application, follow the step-by-step
-[mdBook tutorial](docs/tutorials/add-workload.md).
+[mdBook tutorial](docs/tutorial/quickstart.md).
 
 ## Documentation
 
@@ -27,6 +27,8 @@ The generated site is written to `book/`; the live server defaults to
 `http://127.0.0.1:3000`. Start at the
 [book introduction](docs/README.md) or browse its
 [table of contents](docs/SUMMARY.md).
+
+or on github pages at [nxc-Exa-AtoW @ unk1ndled.github.io](https://unk1ndled.github.io/nxc-Exa-AtoW/index.html).
 
 ## Repository layers
 
@@ -77,15 +79,10 @@ The default flavour is `vm` and the default workload is `openqcd`. For
 the workload is second:
 
 ```console
-just build                         # openqcd::vm
-just build docker                  # openqcd::docker
-just build vm mpi-hello            # mpi-hello::vm
-
 just up                            # openqcd::vm
 just up vm mpi-hello               # mpi-hello::vm
 
 just down docker                  # stop openqcd::docker
-just down docker mpi-hello        # stop mpi-hello::docker
 ```
 
 The two test layers select only a workload because they exercise the VM
