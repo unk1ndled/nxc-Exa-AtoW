@@ -11,10 +11,11 @@
 # Stack
 - [Technology stack](stack/technology-stack.md)
 - [NixOs-Compose](stack/nxc.md)
-- [Ebuffer](stack/ebuffer.md)
+- [Ebuffer and Ebservice](stack/ebuffer.md)
 
 # Tutorial 
 - [Quick start](tutorial/quickstart.md)
+- [Where to work](tutorial/where-to-work.md)
 
 # Reference
 
