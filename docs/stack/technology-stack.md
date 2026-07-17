@@ -5,11 +5,12 @@ have deliberately different jobs.
 
 | Technology | Role here | Start reading |
 | --- | --- | --- |
+| Just | handy tool for running commands and scripts |  [Repository](https://github.com/casey/just)
 | Nix | Pins dependencies and builds packages as immutable store paths. | [How Nix works](https://nixos.org/guides/how-nix-works/) |
 | NixOS | Declares packages, users, services, filesystems, and networking for each node. | [NixOS manual](https://nixos.org/manual/nixos/stable/) |
-| NixOS Compose (NXC) | Builds and launches a distributed set of NixOS roles using a selected flavour such as QEMU VMs or Docker. | [NXC documentation](https://nixos-compose.gitlabpages.inria.fr/nixos-compose/) |
-| ebuffer | Provides ephemeral input and output buffers through an API. | [Exa-AToW package repository](https://gricad-gitlab.univ-grenoble-alpes.fr/exa-atow/ebuffer-nix-pkgs) |
-| ebservice | Stores application, runtime, and pipeline-job control objects. | [ebsclient on PyPI](https://pypi.org/project/ebsclient/) |
+| NixOS Compose (NXC) | Builds and launches a distributed set of NixOS roles using a selected flavour such as QEMU VMs or Docker. | To be efficient go to [next page](./nxc.md) (official [doc](https://nixos-compose.gitlabpages.inria.fr/nixos-compose/) or [tuto](https://nixos-compose.gitlabpages.inria.fr/tuto-nxc/01_intro.html))|
+| ebuffer | Provides ephemeral input and output buffers through an API. | [TODO] |
+| ebservice | Stores application, runtime, and pipeline-job control objects. | [TODO] |
 | SLURM | Allocates nodes, queues jobs, launches steps, and reports scheduler state. | [SLURM quick start](https://slurm.schedmd.com/quickstart.html) |
 | Open MPI | Implements the MPI communication model used by both workloads. | [Open MPI documentation](https://docs.open-mpi.org/en/main/) |
 | PMIx | Connects the scheduler's process launch to the MPI runtime. | [SLURM MPI guide](https://slurm.schedmd.com/mpi_guide.html) |
