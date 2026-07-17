@@ -9,7 +9,7 @@ install:
 check:
     nix flake check
 
-# Build the mdBook documentation into docs/book.
+# Build the mdBook documentation into book/.
 docs:
     nix develop --command mdbook build
 
