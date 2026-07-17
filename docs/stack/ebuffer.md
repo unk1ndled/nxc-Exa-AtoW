@@ -6,6 +6,11 @@ model](../concepts/hpc-as-a-service.md). Ebuffer moves bytes; ebservice moves
 descriptions and state. Neither replaces SLURM: the runtime worker is what
 turns their objects into an actual scheduler job.
 
+<p align="center">
+  <img src="../figs/Composition.png" >
+</p>
+
+
 ## Ebuffer: the data plane
 
 Ephemeral Buffers (ebuffer) are a bounded, temporary, API-visible envelope
@@ -29,9 +34,6 @@ token, never a login, key, or mount on a facility it does not manage.
 
 ### Where it sits in the pipeline
 
-```text
-client <-> ebuffer <-> runtime <-> /users job directory <-> compute ranks
-```
 
 The runtime worker is the only party that ever moves bytes between an ebuffer
 and the shared `/users` job directory. See [Control, data, and execution
@@ -95,11 +97,7 @@ This keeps the scheduling facility's administrator as the sole party able to
 act on its own systems, and keeps every job attributable to the maintainer
 who chose to pull and run it.
 
-### Where it sits in the pipeline
 
-```text
-client -> ebservice -> runtime -> SLURM controller -> slurmd
-```
 
 ### Ebservice in this repository
 
