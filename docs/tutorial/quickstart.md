@@ -8,8 +8,10 @@ two-node scheduler/MPI path used by OpenQCD.
 ```console
   # Install Nix multi user
   curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install | sh -s -- --daemon
+  
   # Install NXC and Just
   uv tool install nixos-compose
+  
   uv tool install rust-just
 ```
 
