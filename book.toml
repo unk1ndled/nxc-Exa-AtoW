@@ -11,7 +11,7 @@ build-dir = "docs/book"
 create-missing = false
 
 [output.html]
-additional-css = ["docs/theme/custom.css"]
+additional-css = ["theme/custom.css"]
 default-theme = "light"
 preferred-dark-theme = "navy"
 git-repository-url = "https://github.com/unk1ndled/nxc-Exa-AtoW"
