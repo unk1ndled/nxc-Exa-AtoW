@@ -9,3 +9,8 @@
 - [Technology stack](concepts/technology-stack.md)
 - [NixOs-Compose](concepts/nxc.md)
 - [Ebuffer](concepts/ebuffer.md)
+
+
+# Reference
+
+- [Command reference](reference/commands.md)

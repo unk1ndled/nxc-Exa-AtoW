@@ -16,9 +16,17 @@
 </div>
 
 ## Get started with nxc
-you can find a comprehensive tutorial [here]() that you can spend a saturday afternoon playing with. But for the ease of getting started, here are a few quickstart guides:
+You can find a comprehensive tutorial [here](https://nixos-compose.gitlabpages.inria.fr/tuto-nxc/01_intro.html) that you can spend a saturday afternoon playing with. But for the ease of getting started, here are the three concepts you need to get moving:
 
+- **composition**: a named combination of a workload (`openqcd`, `mpi-hello`, ...) and a flavor (`vm`, `docker`, ...), written as `<workload>::<flavour>`. In this repository, `compositions.nix` and `nxc.json` declare which compositions exist and which flavor is the default.
+- **`nxc build -C <composition>`**: evaluates and builds every role of the selected composition, producing a store path under `build/<composition>`.
+- **`nxc start -C <composition>`**: deploys the built composition (booting VMs or starting containers, depending on the flavor) and records its metadata under `deploy/<composition>.json`.
 
-composition 
-nxc build
-nxc start
+For example, building and starting the OpenQCD workload as VMs looks like:
+
+```console
+$ nxc build -C openqcd::vm
+$ nxc start -C openqcd::vm
+```
+
+This repository wraps both steps (plus the `QEMU_OPTS` and workload defaults it needs) behind `just build` and `just up`; see the [command reference](../reference/commands.md) for the full recipe list.
