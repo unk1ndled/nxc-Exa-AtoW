@@ -51,27 +51,6 @@ Adding a third plug-in therefore requires matching software and E2E catalog
 entries: a module in `software/`, an `e2e/nxc/` test, and a host application
 contract registered by `e2e/minimal-e2e.py`.
 
-## Workloads
-
-| Composition | Executable | Direct example | Host E2E result |
-| --- | --- | --- | --- |
-| `openqcd` | `ym1` | `examples/openqcd-ym1.sbatch` | `openqcd-e2e.log` |
-| `mpi-hello` | `mpi-hello` | `examples/mpi-hello.sbatch` | `mpi-hello.out` |
-
-The OpenQCD plug-in exposes the overlay's pinned OpenQCD 2.0 `ym1` executable
-on `PATH` and composes the OpenMPI runtime it needs. It retains the compiled
-`2x1x1x1` process grid while reducing the local lattice to the smallest valid
-`4x4x4x4` geometry for this smoke topology. Consequently, it must run with
-exactly two MPI ranks, one on each compute node.
-
-The MPI hello plug-in compiles the repository's small C program with `mpicc`.
-It verifies the same two-node launch path without the OpenQCD input and
-scientific-output checks.
-
-The ebuffer and ebservice roles contain no workload-specific policy. Their
-files under `config/` are bootstrap settings; clients use the services through
-their network APIs.
-
 ## Commands
 
 The default flavour is `vm` and the default workload is `openqcd`. For
