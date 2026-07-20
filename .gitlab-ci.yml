@@ -14,7 +14,7 @@ pages:
   before_script:
     - test -x "$CARGO_HOME/bin/mdbook" || cargo install mdbook --version 0.4.52 --locked
   script:
-    - "$CARGO_HOME/bin/mdbook" build --dest-dir public
+    - '"$CARGO_HOME/bin/mdbook" build --dest-dir public'
     - test -s public/index.html
   artifacts:
     paths:
