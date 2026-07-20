@@ -158,4 +158,4 @@ The generated site is written to `book/`; the live server defaults to
 [table of contents](docs/SUMMARY.md).
 
 Commits to the default branch publish the book on
-[GitLab Pages](https://exa-atow.gricad-pages.univ-grenoble-alpes.fr/canonical-exa-atow-with-nxc/).
+[GitHub Pages](https://unk1ndled.github.io/nxc-Exa-AtoW/).
