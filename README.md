@@ -1,4 +1,4 @@
-# HPC as a Service Infrastructure
+# canonical Exa-AtoW with nxc
 Proof of concept and canonical example for deploying Exa-AtoW style HPC infrastructure using NixOS-Compose.
 
 ## Architecture
@@ -157,4 +157,5 @@ The generated site is written to `book/`; the live server defaults to
 [book introduction](docs/README.md) or browse its
 [table of contents](docs/SUMMARY.md).
 
-or on github pages at [nxc-Exa-AtoW @ unk1ndled.github.io](https://unk1ndled.github.io/nxc-Exa-AtoW/index.html).
+Commits to the default branch publish the book on
+[GitLab Pages](https://exa-atow.gricad-pages.univ-grenoble-alpes.fr/canonical-exa-atow-with-nxc/).

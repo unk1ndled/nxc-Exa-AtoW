@@ -14,9 +14,9 @@ create-missing = false
 additional-css = ["docs/theme/custom.css"]
 default-theme = "light"
 preferred-dark-theme = "navy"
-git-repository-url = "https://github.com/unk1ndled/nxc-Exa-AtoW"
-git-repository-icon = "fa-github"
-edit-url-template = "https://github.com/unk1ndled/nxc-Exa-AtoW/edit/main/{path}"
+git-repository-url = "https://gricad-gitlab.univ-grenoble-alpes.fr/exa-atow/canonical-exa-atow-with-nxc"
+git-repository-icon = "fa-gitlab"
+edit-url-template = "https://gricad-gitlab.univ-grenoble-alpes.fr/exa-atow/canonical-exa-atow-with-nxc/-/edit/main/{path}"
 
 [output.html.fold]
 enable = true
