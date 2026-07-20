@@ -27,5 +27,6 @@ contract change.
 
 - To understand the motivation, begin with
   [Where this fits in Exa-AToW](concepts/exa-atow.md).
-- [ TODO ]
-
+- To run the existing compositions, follow the [quick start](tutorial/quickstart.md).
+- To bring your own scientific code, work through
+  [Add your own MPI workload](tutorial/add-mpi-workload/README.md).
