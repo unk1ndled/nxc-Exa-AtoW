@@ -5,16 +5,18 @@ let
   testNames = builtins.attrNames tests;
 
   mkComposition =
-    name: softwareModule:
+    name: softwareDefinition:
     let
+      softwareModules =
+        if builtins.isList softwareDefinition then
+          softwareDefinition
+        else
+          [ softwareDefinition ];
       test = tests.${name};
     in
     import ./composition.nix {
-      frontendModules = [
-        softwareModule
-        test.frontendModule
-      ];
-      computeModules = [ softwareModule ];
+      frontendModules = softwareModules ++ [ test.frontendModule ];
+      computeModules = softwareModules;
       inherit (test) testScript;
     };
 in
