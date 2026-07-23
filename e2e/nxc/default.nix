@@ -18,6 +18,7 @@ let
     };
 in
 {
-  mpi-hello = withCommon (import ./mpi-hello.nix);
-  openqcd = withCommon (import ./openqcd.nix);
+  mpi-hello = withCommon (import ./mpi-hello.nix { });
+  openqcd = withCommon (import ./openqcd.nix { });
+  multi-software-composition = withCommon (import ./multi-software-composition.nix);
 }
