@@ -9,14 +9,15 @@ batch job, and MPI runs the selected scientific program on two compute nodes.
 Nix and NixOS Compose describe the software and the six machines as one
 reproducible composition.
 
-The repository ships two compositions:
+The repository ships three compositions:
 
 - `mpi-hello`  A fast diagnostic proving that two MPI ranks ran on two distinct compute nodes. 
 - `openqcd`  A small but genuine OpenQCD 2.0 HMC run that exercises input transfer and scientific-output validation. 
+- `multi-software-composition`  Both applications installed together and validated through SLURM.
 
-Both workloads reuse the same ebuffer, ebservice, shared storage, SLURM, SSH,
-test lifecycle, and deployment machinery. Only the application package and its
-contract change.
+All compositions reuse the same ebuffer, ebservice, shared storage, SLURM,
+SSH, test lifecycle, and deployment machinery. A composition can select one
+application module or several.
 
 > This is a local development demonstrator, not a production HPC service. Its
 > tiny VM resources, bootstrap credentials, in-memory data, disabled
