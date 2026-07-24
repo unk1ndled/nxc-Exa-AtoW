@@ -37,15 +37,16 @@ flowchart LR
     Runtime -->|SSH through localhost:2222| Frontend
 ```
 
-This repository exposes two NixOS-Compose compositions over one shared HPC
+This repository exposes three NixOS-Compose compositions over one shared HPC
 topology:
 
 - `openqcd` (the default) runs a small, real OpenQCD 2.0 HMC workload;
-- `mpi-hello` is a fast two-node MPI diagnostic.
+- `mpi-hello` is a fast two-node MPI diagnostic;
+- `multi-software-composition` installs and validates both applications.
 
-Both compositions deploy ebuffer, ebservice, a SLURM frontend and controller,
-and two compute nodes. Only the selected workload is installed on the frontend
-and compute roles.
+Every composition deploys ebuffer, ebservice, a SLURM frontend and controller,
+and two compute nodes. Its selected software module or modules are installed on
+the frontend and compute roles.
 
 To integrate another application, follow the step-by-step
 [mdBook tutorial](docs/tutorial/quickstart.md).
@@ -58,7 +59,7 @@ The implementation keeps three responsibilities separate:
 | Layer | Location | Responsibility |
 | --- | --- | --- |
 | Shared infrastructure | `composition.nix` | Builds the role-neutral ebuffer, ebservice, shared-storage, Munge, and SLURM topology from injected modules and a test script. |
-| Workload software | `software/default.nix` | Maps each composition name to the NixOS module installed on its frontend and compute nodes. |
+| Workload software | `software/default.nix` | Maps each composition name to one NixOS module or a list installed on its frontend and compute nodes. |
 | Workload validation | `e2e/nxc/` and `e2e/*.py` | Supplies app-specific NXC tests and host-side API contracts while reusing common readiness and lifecycle code. |
 
 `compositions.nix` joins the software and NXC-test catalogs and rejects
@@ -68,9 +69,10 @@ API, SSH, scheduler, transfer, timeout, diagnostics, and cleanup lifecycle;
 `mpi_hello_e2e.py` and `openqcd_e2e.py` define only their application
 contracts.
 
-Adding a third plug-in therefore requires matching software and E2E catalog
-entries: a module in `software/`, an `e2e/nxc/` test, and a host application
-contract registered by `e2e/minimal-e2e.py`.
+Adding an application requires a module in `software/` and its application
+tests. A composition selects one module or a list and has a matching entry in
+`e2e/nxc/`; combined compositions can reuse existing host application
+contracts while providing composition-level NXC validation.
 
 
 
@@ -121,18 +123,23 @@ flavour:
 ```console
 just nxc-test                      # OpenQCD in-topology integration test
 just nxc-test mpi-hello
+just nxc-test multi-software-composition
 
 just tunnel                        # expose the running OpenQCD VM
 just tunnel mpi-hello
 
 just test                          # OpenQCD API-to-SLURM host E2E
 just test mpi-hello
+just test multi-software-composition mpi-hello
+just test multi-software-composition openqcd
 ```
 
 `just nxc-test` builds the selected composition and runs its test from inside
 NXC. `just test` expects that composition's VM deployment to be running,
-establishes its tunnels, and launches the matching host E2E. Use
-`just install` once to create `e2e/.venv` from the locked dependencies.
+establishes its tunnels, and launches the selected application's host E2E. Its
+second argument defaults to the composition name for single-application
+compositions. Use `just install` once to create `e2e/.venv` from the locked
+dependencies.
 
 For the pinned NXC version, stop a VM deployment by interrupting its foreground
 `just up` process with Ctrl-C. Its standalone VM stop path calls a missing
