@@ -17,24 +17,25 @@ docs:
 docs-serve hostname="127.0.0.1" port="3000":
     nix develop --command mdbook serve --hostname "{{ hostname }}" --port "{{ port }}"
 
-# Build one workload composition. The flavour stays first for `just build docker` compatibility.
+# Build one composition. The flavour stays first for `just build docker` compatibility.
 build flavour="vm" workload="openqcd":
     nix develop --command nxc build -f "{{ flavour }}" -C "{{ workload }}::{{ flavour }}"
 
-# Build and start the shared topology with one selected workload.
+# Build and start the shared topology with one selected composition.
 up flavour="vm" workload="openqcd":
     just build "{{ flavour }}" "{{ workload }}"
     QEMU_OPTS="${QEMU_OPTS:--cpu host}" nix develop --command nxc start -C "{{ workload }}::{{ flavour }}"
 
-# Run the selected workload's NXC integration test inside the topology.
+# Run the selected composition's NXC integration test inside the topology.
 nxc-test workload="openqcd":
     just build vm "{{ workload }}"
     QEMU_OPTS="${QEMU_OPTS:--cpu host}" nix develop --command nxc start -t -C "{{ workload }}::vm"
 
-# Run the selected workload's API-to-SLURM host E2E against its VM composition.
-test workload="openqcd":
+# Run one application's API-to-SLURM host E2E against the selected VM composition.
+# The optional application argument is useful when a composition contains several packages.
+test workload="openqcd" application=workload:
     just tunnel "{{ workload }}"
-    nix develop --command e2e-fhs -c "uv run --project e2e bash scripts/run-e2e.sh '{{ workload }}'"
+    nix develop --command e2e-fhs -c "uv run --project e2e bash scripts/run-e2e.sh '{{ application }}'"
 
 # Forward APIs and frontend SSH from the selected VM composition.
 tunnel workload="openqcd":
