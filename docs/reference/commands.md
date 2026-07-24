@@ -52,16 +52,20 @@ For the pinned NXC release, stop VM deployments with Ctrl-C in the foreground
 
 ## Tests and tunnels
 
-These recipes select a workload only and target the VM path:
+These recipes target the VM path. `just test` accepts a composition followed
+by an optional application; the application defaults to the composition name.
 
 | Command | Effect |
 | --- | --- |
 | `just nxc-test` | Build and run the OpenQCD test inside a temporary VM topology. |
 | `just nxc-test mpi-hello` | Run the MPI hello in-topology test. |
+| `just nxc-test multi-software-composition` | Run both application jobs in one topology. |
 | `just tunnel` | Forward a live `openqcd::vm` deployment. |
 | `just tunnel mpi-hello` | Forward a live `mpi-hello::vm` deployment. |
 | `just test` | Tunnel to a live OpenQCD VM deployment and run its host E2E. |
 | `just test mpi-hello` | Tunnel to a live MPI hello VM deployment and run its host E2E. |
+| `just test multi-software-composition mpi-hello` | Run the MPI Hello host contract against the combined deployment. |
+| `just test multi-software-composition openqcd` | Run the OpenQCD host contract against the combined deployment. |
 
 `just nxc-test` starts its own topology. `just test` expects a matching
 `just up` process already running.

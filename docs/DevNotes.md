@@ -1,23 +1,23 @@
 # E2E Development Notes
 
-The repository has two validation paths for each workload. The NXC test runs
+The repository has two validation paths for each application. The NXC test runs
 inside the generated topology; the host E2E enters through ebservice and
 ebuffer, drives a runtime worker, and reaches the frontend through local SSH
-forwarding. Their application logic is separate, but both select the same
-`openqcd` or `mpi-hello` composition key.
+forwarding. A single-software composition can use the same application name in
+both paths; a combined composition selects its host application separately.
 
 ## Validation follows the repository layers
 
 `composition.nix` is only an infrastructure factory. `compositions.nix` joins
-the module named in `software/default.nix` with the identically named plug-in
-from `e2e/nxc/default.nix`. Evaluation fails if the software and NXC-test
-catalog keys differ.
+the module or module list selected in `software/default.nix` with the
+identically named plug-in from `e2e/nxc/default.nix`. Evaluation fails if the
+software-selection and NXC-test catalog keys differ.
 
 `e2e/nxc/common.nix` waits for ebuffer, ebservice, login, the SLURM controller,
-and both compute daemons. Each app-specific NXC plug-in then stages its own
-fixture on shared `/users`, confirms its executable is present and the other
-catalog workload is absent, submits its two-node batch job, and validates the
-result.
+and both compute daemons. Single-software NXC plug-ins also check isolation.
+The combined plug-in stages both fixtures and submits both two-node batch jobs,
+which proves that both executables are present on the compute nodes. It
+refreshes the frontend SSH subprocess between the two application checks.
 
 The pinned NXC VM driver's SSH process accepts only one command per machine
 during `nxc start -t`; a second call tries to reuse an already-communicated
@@ -48,9 +48,9 @@ live in `mpi-hello-job.ini` and `openqcd-job.ini`, while
 ## RemoteManager needs an FHS-shaped environment
 
 RemoteManager invokes `/bin/bash` directly in some fallback command paths.
-NixOS intentionally has no `/bin/bash`, so `just test [workload]` runs inside
-the `e2e-fhs` environment defined in `flake.nix`. It contains Bash, SSH,
-rsync, uv, and the basic tools needed by the test.
+NixOS intentionally has no `/bin/bash`, so `just test [composition]
+[application]` runs inside the `e2e-fhs` environment defined in `flake.nix`.
+It contains Bash, SSH, rsync, uv, and the basic tools needed by the test.
 
 Ideally RemoteManager would resolve Bash from `PATH`, accept an executable
 path, or avoid shell fallbacks. Failed commands can leave randomly named
@@ -65,7 +65,7 @@ inspecting QEMU command lines. `scripts/tunnel.sh` matches the VM ID encoded in
 the MAC address and extracts its `hostfwd` port. This works for the current NXC
 VM flavour but depends on its implementation details.
 
-Both compositions expose services on the same loopback ports: ebuffer on
+All compositions expose services on the same loopback ports: ebuffer on
 8000, ebservice on 8001, and frontend SSH on 2222. Only one composition can be
 tunneled at a time. The script records the active deployment below
 `/tmp/nxc-exa-atow-tunnels-$UID`; when another workload is selected it closes
