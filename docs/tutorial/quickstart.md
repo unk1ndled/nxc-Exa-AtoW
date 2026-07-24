@@ -3,16 +3,89 @@
 Start with `mpi-hello`. It is fast, has no input file, and proves the same
 two-node scheduler/MPI path used by OpenQCD.
 
-## 0. Install Nix, NXC and Just
+## 0. Install the requirements
+
+The supported VM workflow expects:
+
+- an x86-64 Linux host;
+- Nix with the `nix-command` and `flakes` features enabled;
+- [Just](https://just.systems/man/en/), a command runner similar to Make; and
+- an SSH key pair used to connect to the disposable local VMs.
+
+The topology starts six QEMU VMs. The host must have enough memory for the
+guests and the Nix build, and access to KVM is strongly recommended.
+
+### Install and configure Nix
+
+Follow the [official Nix installation
+instructions](https://nixos.org/download/). On a Linux host with systemd, the
+recommended multi-user installation is:
 
 ```console
-  # Install Nix multi user
-  curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install | sh -s -- --daemon
-  
-  # Install NXC and Just
-  uv tool install nixos-compose
-  
-  uv tool install rust-just
+$ curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install | sh -s -- --daemon
+```
+
+Open a new shell after installation, then enable the features used by this
+repository:
+
+```console
+$ mkdir -p ~/.config/nix
+$ echo "experimental-features = nix-command flakes" >> ~/.config/nix/nix.conf
+```
+
+See the [Nix flakes documentation](https://nix.dev/concepts/flakes.html) for
+other ways to enable these features.
+
+### Install Just
+
+Just stores project commands, called recipes, in the root `justfile`. It is
+similar to Make, but is a command runner rather than a build system. Install it
+with Nix:
+
+```console
+$ nix profile install nixpkgs#just
+$ just --version
+```
+
+The [Just installation
+documentation](https://just.systems/man/en/packages.html) lists alternatives
+for other package managers. NXC, uv, jq, and the other project tools do not
+need separate host installations: the pinned versions are supplied by
+`nix develop` when a Just recipe needs them.
+
+### Create the local VM SSH key
+
+The pinned NXC VM backend reads `~/.ssh/id_rsa.pub` when it starts a topology
+and adds that public key to the local VMs. The tunnel and host E2E then use the
+matching private key at `~/.ssh/id_rsa`. These keys are for the disposable
+local VMs; they are not Grid'5000 credentials.
+
+If this key pair does not already exist in the environment running NXC, create
+one:
+
+```console
+$ mkdir -p ~/.ssh
+$ chmod 700 ~/.ssh
+$ ssh-keygen -t rsa -b 4096 -N "" -f ~/.ssh/id_rsa
+```
+
+The tunnel and E2E scripts accept a different private key through
+`NXC_IDENTITY_FILE`, but it must match the public key injected when NXC starts
+the VMs. The current `just up` and `just nxc-test` recipes rely on NXC's
+default `~/.ssh/id_rsa.pub` startup location.
+
+To use another key pair, build first and invoke `nxc start` with its public key
+instead of using `just up`:
+
+```console
+# terminal 1
+$ just build vm mpi-hello
+$ QEMU_OPTS="-cpu host" nix develop --command nxc start \
+    --identity-file "$HOME/.ssh/id_ed25519.pub" \
+    -C "mpi-hello::vm"
+
+# terminal 2
+$ NXC_IDENTITY_FILE="$HOME/.ssh/id_ed25519" just test mpi-hello
 ```
 
 ## 1. Run the self-contained topology test
@@ -96,4 +169,25 @@ $ just nxc-test
 $ just up
 # in another terminal
 $ just test
+```
+
+## 4. Run both applications in one composition
+
+The combined composition installs both software modules on the frontend and
+compute nodes. Its NXC test submits both jobs:
+
+```console
+$ just nxc-test multi-software-composition
+```
+
+For host-side validation, keep the combined deployment running and select the
+application contract with the second `just test` argument:
+
+```console
+# terminal 1
+$ just up vm multi-software-composition
+
+# terminal 2
+$ just test multi-software-composition mpi-hello
+$ just test multi-software-composition openqcd
 ```

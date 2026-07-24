@@ -144,6 +144,16 @@ Add the new key to `software/default.nix`:
 }
 ```
 
+Catalog values may also be lists. Use that form when a composition should
+install several existing modules on every frontend and compute node:
+
+```nix
+multi-software-composition = [
+  ./mpi-hello.nix
+  ./openqcd.nix
+];
+```
+
 When applying these changes incrementally, `just check` should fail at this
 moment because the test catalog does not yet contain `mpi-calculator`. That
 failure confirms that the catalog guard is working. The next chapter adds the

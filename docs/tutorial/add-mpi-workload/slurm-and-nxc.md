@@ -98,9 +98,10 @@ frontend, and compute nodes, and the fixture must not run before that mount is
 ready.
 
 The test checks both presence and isolation. `mpi-calculator` must be on
-`PATH`, while the executables belonging to the other compositions must not be
-there. It then submits as `user1`; running as root would hide ownership and
-login-environment mistakes.
+`PATH`, while executables not selected by this composition must not be there.
+A combined composition instead checks every selected executable. The test then
+submits as `user1`; running as root would hide ownership and login-environment
+mistakes.
 
 Register the test in `e2e/nxc/default.nix` alongside the existing entries:
 
@@ -108,8 +109,9 @@ Register the test in `e2e/nxc/default.nix` alongside the existing entries:
 in
 {
   mpi-calculator = withCommon (import ./mpi-calculator.nix);
-  mpi-hello = withCommon (import ./mpi-hello.nix);
-  openqcd = withCommon (import ./openqcd.nix);
+  mpi-hello = withCommon (import ./mpi-hello.nix { });
+  multi-software-composition = withCommon (import ./multi-software-composition.nix);
+  openqcd = withCommon (import ./openqcd.nix { });
 }
 ```
 
