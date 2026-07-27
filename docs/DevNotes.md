@@ -8,16 +8,18 @@ both paths; a combined composition selects its host application separately.
 
 ## Validation follows the repository layers
 
-`composition.nix` is only an infrastructure factory. `compositions.nix` joins
-the module or module list selected in `software/default.nix` with the
-identically named plug-in from `e2e/nxc/default.nix`. Evaluation fails if the
-software-selection and NXC-test catalog keys differ.
+`composition.nix` is only an infrastructure factory. `compositions.nix`
+normalizes the uniform or per-node selection from `software/default.nix` and
+joins it with the identically named plug-in from `e2e/nxc/default.nix`.
+Evaluation fails if the software-selection and NXC-test catalog keys differ.
 
 `e2e/nxc/common.nix` waits for ebuffer, ebservice, login, the SLURM controller,
-and both compute daemons. Single-software NXC plug-ins also check isolation.
+and every declared compute daemon. Single-software NXC plug-ins also check isolation.
 The combined plug-in stages both fixtures and submits both two-node batch jobs,
 which proves that both executables are present on the compute nodes. It
 refreshes the frontend SSH subprocess between the two application checks.
+The heterogeneous plug-in verifies node-local package isolation and SLURM
+features, then runs OpenQCD across the two nodes that advertise it.
 
 The pinned NXC VM driver's SSH process accepts only one command per machine
 during `nxc start -t`; a second call tries to reuse an already-communicated

@@ -16,7 +16,9 @@ NixOS role that enables each service remains in `composition.nix`.
 Add its package module under `software/`, then register its name in
 `software/default.nix`. A composition value may be a single module or a list;
 every selected module is injected into the frontend and compute roles. Modules
-should not redefine the shared topology.
+should not redefine the shared topology. For heterogeneous nodes, use an
+attribute set with `frontendModules` and `computeNodes`; every compute node
+declares its own `modules` and optional SLURM `features`.
 
 A composition is not complete until the same name is added under `e2e/nxc/`
 with checks for its selected software set. If an application is submitted

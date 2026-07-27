@@ -6,8 +6,9 @@ scientific-computing architectures. A composition groups the machines,
 services, one or more software modules, and tests needed to reproduce one
 architecture.
 
-Today, `mpi-hello` and `openqcd` can run separately or together in
-`multi-software-composition` on the same six-machine topology.
+Today, `mpi-hello` and `openqcd` can run separately, together in
+`multi-software-composition`, or with different node-local availability in
+`heterogeneous-cluster`.
 
 ## Repository map
 
@@ -21,7 +22,7 @@ Today, `mpi-hello` and `openqcd` can run separately or together in
 ├── compositions.nix          Joins each software selection to its matching test
 │
 ├── software/                 Packages installed on frontend and compute nodes
-│   ├── default.nix           Composition-to-module/module-list catalog
+│   ├── default.nix           Uniform and per-node software catalog
 │   ├── openmpi.nix           MPI setup shared by the workloads
 │   ├── mpi-hello.nix         MPI hello package and environment
 │   └── openqcd.nix           OpenQCD package and environment
@@ -36,7 +37,8 @@ Today, `mpi-hello` and `openqcd` can run separately or together in
 │   │   ├── common.nix        Checks shared by every workload
 │   │   ├── mpi-hello.nix     MPI hello deployment checks
 │   │   ├── openqcd.nix       OpenQCD deployment checks
-│   │   └── multi-software-composition.nix  Combined checks
+│   │   ├── multi-software-composition.nix  Combined checks
+│   │   └── heterogeneous-cluster.nix       Per-node checks
 │   ├── common.py             Shared host-side job lifecycle
 │   ├── minimal-e2e.py        Selects the workload contract
 │   ├── *_e2e.py              Workload-specific API and output checks
@@ -50,7 +52,7 @@ Today, `mpi-hello` and `openqcd` can run separately or together in
 The two catalogs are the main assembly point:
 
 ```text
-software/default.nix: <name> = <module> or [ <modules> ]
+software/default.nix: <name> = <uniform modules> or <per-node layout>
         +
 e2e/nxc/<name>.nix
         +

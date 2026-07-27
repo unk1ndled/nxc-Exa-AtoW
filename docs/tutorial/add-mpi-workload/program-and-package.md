@@ -154,6 +154,38 @@ multi-software-composition = [
 ];
 ```
 
+For node-local software, use the explicit form. Compute names must match
+`compute[1-9][0-9]*`; the optional features become SLURM constraints:
+
+```nix
+heterogeneous-cluster = {
+  frontendModules = [
+    ./mpi-hello.nix
+    ./openqcd.nix
+  ];
+  computeNodes = {
+    compute1 = {
+      modules = [
+        ./mpi-hello.nix
+        ./openqcd.nix
+      ];
+      features = [
+        "mpi-hello"
+        "openqcd"
+      ];
+    };
+    compute2 = {
+      modules = [ ./openqcd.nix ];
+      features = [ "openqcd" ];
+    };
+  };
+};
+```
+
+Users can target compatible nodes with `srun --constraint=openqcd ...` or an
+exact role with `srun --nodelist=compute1 ...`. Multi-node jobs require enough
+nodes that share the selected feature.
+
 When applying these changes incrementally, `just check` should fail at this
 moment because the test catalog does not yet contain `mpi-calculator`. That
 failure confirms that the catalog guard is working. The next chapter adds the

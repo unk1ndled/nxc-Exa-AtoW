@@ -37,16 +37,18 @@ flowchart LR
     Runtime -->|SSH through localhost:2222| Frontend
 ```
 
-This repository exposes three NixOS-Compose compositions over one shared HPC
+This repository exposes four NixOS-Compose compositions over one shared HPC
 topology:
 
 - `openqcd` (the default) runs a small, real OpenQCD 2.0 HMC workload;
 - `mpi-hello` is a fast two-node MPI diagnostic;
-- `multi-software-composition` installs and validates both applications.
+- `multi-software-composition` installs and validates both applications;
+- `heterogeneous-cluster` installs MPI Hello only on `compute1` while keeping
+  OpenQCD on both compute nodes.
 
 Every composition deploys ebuffer, ebservice, a SLURM frontend and controller,
-and two compute nodes. Its selected software module or modules are installed on
-the frontend and compute roles.
+and one or more named compute nodes. Catalog entries can apply the same modules
+to every node or select modules and SLURM features per compute node.
 
 To integrate another application, follow the step-by-step
 [mdBook tutorial](docs/tutorial/quickstart.md).
@@ -59,7 +61,7 @@ The implementation keeps three responsibilities separate:
 | Layer | Location | Responsibility |
 | --- | --- | --- |
 | Shared infrastructure | `composition.nix` | Builds the role-neutral ebuffer, ebservice, shared-storage, Munge, and SLURM topology from injected modules and a test script. |
-| Workload software | `software/default.nix` | Maps each composition name to one NixOS module or a list installed on its frontend and compute nodes. |
+| Workload software | `software/default.nix` | Maps each composition name to a uniform module selection or an explicit per-node software layout. |
 | Workload validation | `e2e/nxc/` and `e2e/*.py` | Supplies app-specific NXC tests and host-side API contracts while reusing common readiness and lifecycle code. |
 
 `compositions.nix` joins the software and NXC-test catalogs and rejects
@@ -70,8 +72,9 @@ API, SSH, scheduler, transfer, timeout, diagnostics, and cleanup lifecycle;
 contracts.
 
 Adding an application requires a module in `software/` and its application
-tests. A composition selects one module or a list and has a matching entry in
-`e2e/nxc/`; combined compositions can reuse existing host application
+tests. A composition selects one module, a uniform list, or explicit
+`frontendModules` and `computeNodes`, and has a matching entry in `e2e/nxc/`.
+Combined and heterogeneous compositions can reuse existing application
 contracts while providing composition-level NXC validation.
 
 
