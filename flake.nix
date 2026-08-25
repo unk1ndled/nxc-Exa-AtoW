@@ -47,6 +47,7 @@
         packages = [
           e2eFhs
           pkgs.jq
+          pkgs.just
           pkgs.mdbook
           pkgs.uv
         ];
