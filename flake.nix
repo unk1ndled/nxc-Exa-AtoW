@@ -51,6 +51,11 @@
           pkgs.mdbook
           pkgs.uv
         ];
+        shellHook = ''
+          if [[ -x "$HOME/.local/bin/nix" ]]; then
+            export PATH="$PATH:$HOME/.local/bin"
+          fi
+        '';
       };
     };
 }
