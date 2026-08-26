@@ -3,7 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/25.05";
-    ebufferpkgs.url = "git+https://gricad-gitlab.univ-grenoble-alpes.fr/exa-atow/ebuffer-nix-pkgs.git?ref=full-workflow";
+    exaAtowPkgs.url = "git+https://gricad-gitlab.univ-grenoble-alpes.fr/exa-atow/exa-atow-nix-pkgs.git";
     nxc.url = "git+https://gitlab.inria.fr/nixos-compose/nixos-compose.git?ref=25.05";
   };
 
@@ -11,14 +11,14 @@
     {
       self,
       nixpkgs,
-      ebufferpkgs,
+      exaAtowPkgs,
       nxc,
     }:
     let
       system = "x86_64-linux";
       pkgs = import nixpkgs {
         inherit system;
-        overlays = [ ebufferpkgs.overlays.default ];
+        overlays = [ exaAtowPkgs.overlays.default ];
       };
       e2eFhs = pkgs.buildFHSEnv {
         name = "e2e-fhs";
@@ -34,8 +34,8 @@
       composed = nxc.lib.compose {
         inherit nixpkgs system;
         compositions = import ./compositions.nix;
-        overlays = [ ebufferpkgs.overlays.default ];
-        extraConfigurations = [ ebufferpkgs.nixosModules.default ];
+        overlays = [ exaAtowPkgs.overlays.default ];
+        extraConfigurations = [ exaAtowPkgs.nixosModules.default ];
       };
     in
     {
@@ -51,6 +51,11 @@
           pkgs.mdbook
           pkgs.uv
         ];
+        shellHook = ''
+          if [[ -x "$HOME/.local/bin/nix" ]]; then
+            export PATH="$PATH:$HOME/.local/bin"
+          fi
+        '';
       };
     };
 }
