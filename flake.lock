@@ -1,23 +1,22 @@
 {
   "nodes": {
-    "ebufferpkgs": {
+    "exaAtowPkgs": {
       "inputs": {
         "flake-parts": "flake-parts",
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1780576184,
-        "narHash": "sha256-QcsQwz+771x79Wocf5u9bCFtkWvyXYXSsYR71YEceIk=",
-        "ref": "full-workflow",
-        "rev": "4aa87236b041107fa5bebabedeb8b9d2ea1d08d5",
-        "revCount": 58,
+        "lastModified": 1787739376,
+        "narHash": "sha256-fwLkKuwVtyyMxig17+5X7Ahiv2rqvDsvHQVpmk7cp5U=",
+        "ref": "refs/heads/main",
+        "rev": "3ac197971b82118236395e42f94a93f2c23b90c9",
+        "revCount": 174,
         "type": "git",
-        "url": "https://gricad-gitlab.univ-grenoble-alpes.fr/exa-atow/ebuffer-nix-pkgs.git"
+        "url": "https://gricad-gitlab.univ-grenoble-alpes.fr/exa-atow/exa-atow-nix-pkgs.git"
       },
       "original": {
-        "ref": "full-workflow",
         "type": "git",
-        "url": "https://gricad-gitlab.univ-grenoble-alpes.fr/exa-atow/ebuffer-nix-pkgs.git"
+        "url": "https://gricad-gitlab.univ-grenoble-alpes.fr/exa-atow/exa-atow-nix-pkgs.git"
       }
     },
     "flake-parts": {
@@ -99,11 +98,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1775710090,
-        "narHash": "sha256-ar3rofg+awPB8QXDaFJhJ2jJhu+KqN/PRCXeyuXR76E=",
+        "lastModified": 1787498568,
+        "narHash": "sha256-9i/VTdusq/+NM/tz+J1Re+ojkMB8MBf0QshnYfzHz30=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "4c1018dae018162ec878d42fec712642d214fdfa",
+        "rev": "56c02bc00adcf003215cc4bd996d6efaf4cff188",
         "type": "github"
       },
       "original": {
@@ -184,7 +183,7 @@
     },
     "root": {
       "inputs": {
-        "ebufferpkgs": "ebufferpkgs",
+        "exaAtowPkgs": "exaAtowPkgs",
         "nixpkgs": "nixpkgs_2",
         "nxc": "nxc"
       }
