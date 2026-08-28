@@ -6,7 +6,6 @@
 
 - [Where this fits in Exa-AToW](concepts/exa-atow.md)
 - [Repository architecture](concepts/monorepo.md)
-- [Control, data, and execution flows](architecture/flows.md)
 - [The HPC-as-a-Service mental model](concepts/hpc-as-a-service.md)
 
 - [Stack](concepts/stack/README.md)
