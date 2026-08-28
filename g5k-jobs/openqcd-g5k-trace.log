@@ -1,195 +1,0 @@
-Building openqcd::g5k-nfs-store
-warning: Git tree '/home/msalmane/nxc-Exa-AtoW' is dirty
-error (ignored): error: package 'nixpkgs#bashInteractive' does not provide a 'bin/bash'
-Starting Build
-warning: Git tree '/home/msalmane/nxc-Exa-AtoW' is dirty
-these 34 derivations will be built:
-  /nix/store/74618vlipnfk7xlazq6wspfr59a2h4j1-openQCD-2.0.tar.gz.drv
-  /nix/store/mfaf8adi5k4i1l5kixif6bfi7298pgz1-openQCD-2.0.drv
-  /nix/store/lkwg3zlzmk90qnrw5f2yfbw21jdb0w7n-openqcd-bins.drv
-  /nix/store/irxx283aq60w71iigswlvkbp22n9bii4-system-path.drv
-  /nix/store/900m947cn3vgvmp96lk564w66pn8accc-dbus-1.drv
-  /nix/store/jsm806fgizw8mdkpbrjlh6x9gcb8p29y-X-Restart-Triggers-dbus.drv
-  /nix/store/q90p4xv8nksk2mf11mly60bvc236pd66-unit-dbus.service.drv
-  /nix/store/5jv9dparnw5ssliq9dcdvriqcjkaxw24-user-units.drv
-  /nix/store/iq6nr40k16hlmdzh4d45g6sm4yv8b4xp-etc-nxc-composition.drv
-  /nix/store/1xchjwam6r635wafk9nkgzfla4dc7v3m-unit-dbus.service.drv
-  /nix/store/qpa3yia075srmglm8lnfym8ylbwyz1d7-system-units.drv
-  /nix/store/0qndwf3hklq2z718zwv651qxa6bxglxz-etc.drv
-  /nix/store/1w388vynsw2m6jh7b0pn4s1jd01pmzwa-etc.drv
-  /nix/store/55m9c217wydbcl5crhfmy7m4yrd9an69-nixos-system-unnamed-25.05pre-git.drv
-  /nix/store/w4wcq51770v9cir80smr01hxrc4a033x-etc.drv
-  /nix/store/58hfkqb2mcgpanlmvi8flmfrp61nb8iw-nixos-system-unnamed-25.05pre-git.drv
-  /nix/store/7nhfp4cxx7fdq2g8g93qfmcybpq686af-unit-script-setup-openqcd-test-start.drv
-  /nix/store/l9v418jmsr0ma4h9k3j31f7pz64rxca5-unit-setup-openqcd-test.service.drv
-  /nix/store/hzr6n9596c1gw1w8z5139mrdzxgzpq2c-system-units.drv
-  /nix/store/623w83fby151jvgggwm2xr06x8jdq31b-etc.drv
-  /nix/store/bhgk9xgzbsp20kh9swl2m69dgij4pki3-nixos-system-unnamed-25.05pre-git.drv
-  /nix/store/700j9wj95f2yby1scqmd5zvjrr5c0qlr-closure-info.drv
-  /nix/store/h0s10pi212h8gfgcj4s8i7jl3vkl4ndf-closure-info.drv
-  /nix/store/mh66yrcmab04j7dmarldbiyr1qc04vvb-etc.drv
-  /nix/store/yw3qqbf62x6l4lg6bz15wqas4hw31xgl-nixos-system-unnamed-25.05pre-git.drv
-  /nix/store/l002yvbp109ybcs1ad1w83ql43h0d43y-closure-info.drv
-  /nix/store/q7y8b6hz72wwh51r0lj0ical686jaa8a-closure-info.drv
-  /nix/store/p9l60py85m35grk45813dmr65r71xpix-nixos-system-unnamed-25.05pre-git.drv
-  /nix/store/w3lfc64kb9m74l0cariij4xjxp3n02s4-closure-info.drv
-  /nix/store/y22f0mnlb59vvhljcfg6ma6mm8xzp29s-all-store-info.drv
-  /nix/store/hkcrklb9yf9n5yb2g6i59qnw5q8kfcjg-all-compositions-registration-store-paths.drv
-  /nix/store/vwirzdxhbs0m380pypa3kg9cadmp4a27-test-script.drv
-  /nix/store/z4r6x40wkf8x6ymbqsxzr80dpclf8yq5-compositions-info.json.drv
-  /nix/store/82nslv31xszpj9dyz44l17pmphaz1k6l-compose-info.json.drv
-building '/nix/store/vwirzdxhbs0m380pypa3kg9cadmp4a27-test-script.drv'...
-building '/nix/store/iq6nr40k16hlmdzh4d45g6sm4yv8b4xp-etc-nxc-composition.drv'...
-building '/nix/store/74618vlipnfk7xlazq6wspfr59a2h4j1-openQCD-2.0.tar.gz.drv'...
-building '/nix/store/1w388vynsw2m6jh7b0pn4s1jd01pmzwa-etc.drv'...
-building '/nix/store/mh66yrcmab04j7dmarldbiyr1qc04vvb-etc.drv'...
-building '/nix/store/w4wcq51770v9cir80smr01hxrc4a033x-etc.drv'...
-building '/nix/store/p9l60py85m35grk45813dmr65r71xpix-nixos-system-unnamed-25.05pre-git.drv'...
-building '/nix/store/58hfkqb2mcgpanlmvi8flmfrp61nb8iw-nixos-system-unnamed-25.05pre-git.drv'...
-building '/nix/store/w3lfc64kb9m74l0cariij4xjxp3n02s4-closure-info.drv'...
-building '/nix/store/q7y8b6hz72wwh51r0lj0ical686jaa8a-closure-info.drv'...
-building '/nix/store/yw3qqbf62x6l4lg6bz15wqas4hw31xgl-nixos-system-unnamed-25.05pre-git.drv'...
-building '/nix/store/mfaf8adi5k4i1l5kixif6bfi7298pgz1-openQCD-2.0.drv'...
-building '/nix/store/l002yvbp109ybcs1ad1w83ql43h0d43y-closure-info.drv'...
-building '/nix/store/lkwg3zlzmk90qnrw5f2yfbw21jdb0w7n-openqcd-bins.drv'...
-building '/nix/store/7nhfp4cxx7fdq2g8g93qfmcybpq686af-unit-script-setup-openqcd-test-start.drv'...
-building '/nix/store/irxx283aq60w71iigswlvkbp22n9bii4-system-path.drv'...
-building '/nix/store/l9v418jmsr0ma4h9k3j31f7pz64rxca5-unit-setup-openqcd-test.service.drv'...
-building '/nix/store/900m947cn3vgvmp96lk564w66pn8accc-dbus-1.drv'...
-building '/nix/store/jsm806fgizw8mdkpbrjlh6x9gcb8p29y-X-Restart-Triggers-dbus.drv'...
-building '/nix/store/1xchjwam6r635wafk9nkgzfla4dc7v3m-unit-dbus.service.drv'...
-building '/nix/store/q90p4xv8nksk2mf11mly60bvc236pd66-unit-dbus.service.drv'...
-building '/nix/store/hzr6n9596c1gw1w8z5139mrdzxgzpq2c-system-units.drv'...
-building '/nix/store/qpa3yia075srmglm8lnfym8ylbwyz1d7-system-units.drv'...
-building '/nix/store/5jv9dparnw5ssliq9dcdvriqcjkaxw24-user-units.drv'...
-building '/nix/store/0qndwf3hklq2z718zwv651qxa6bxglxz-etc.drv'...
-building '/nix/store/623w83fby151jvgggwm2xr06x8jdq31b-etc.drv'...
-building '/nix/store/55m9c217wydbcl5crhfmy7m4yrd9an69-nixos-system-unnamed-25.05pre-git.drv'...
-building '/nix/store/bhgk9xgzbsp20kh9swl2m69dgij4pki3-nixos-system-unnamed-25.05pre-git.drv'...
-building '/nix/store/h0s10pi212h8gfgcj4s8i7jl3vkl4ndf-closure-info.drv'...
-building '/nix/store/700j9wj95f2yby1scqmd5zvjrr5c0qlr-closure-info.drv'...
-building '/nix/store/y22f0mnlb59vvhljcfg6ma6mm8xzp29s-all-store-info.drv'...
-building '/nix/store/hkcrklb9yf9n5yb2g6i59qnw5q8kfcjg-all-compositions-registration-store-paths.drv'...
-building '/nix/store/z4r6x40wkf8x6ymbqsxzr80dpclf8yq5-compositions-info.json.drv'...
-building '/nix/store/82nslv31xszpj9dyz44l17pmphaz1k6l-compose-info.json.drv'...
-
-Build completed
-warning: Git tree '/home/msalmane/nxc-Exa-AtoW' is dirty
-error (ignored): error: package 'nixpkgs#bashInteractive' does not provide a 'bin/bash'
-warning: Git tree '/home/msalmane/nxc-Exa-AtoW' is dirty
-error (ignored): error: package 'nixpkgs#bashInteractive' does not provide a 'bin/bash'
-warning: Git tree '/home/msalmane/nxc-Exa-AtoW' is dirty
-error (ignored): error: package 'nixpkgs#bashInteractive' does not provide a 'bin/bash'
-# Filtering out exotic resources (vercors4, servan, yeti, troll, drac, sasquatch).
-OAR_JOB_ID=3047325
-Waiting for 6 reserved nodes in /home/msalmane/nxc-Exa-AtoW/deploy/g5k-jobs/OAR.3047325.stdout
-Deploying openqcd::g5k-nfs-store on OAR job 3047325
-warning: Git tree '/home/msalmane/nxc-Exa-AtoW' is dirty
-error (ignored): error: package 'nixpkgs#bashInteractive' does not provide a 'bin/bash'
-Starting
-['172.16.20.27', '172.16.20.28', '172.16.20.29', '172.16.20.30', '172.16.20.5', '172.16.20.6'] {'dahu-27.grenoble.grid5000.fr': '172.16.20.27', 'dahu-28.grenoble.grid5000.fr': '172.16.20.28', 'dahu-29.grenoble.grid5000.fr': '172.16.20.29', 'dahu-30.grenoble.grid5000.fr': '172.16.20.30', 'dahu-5.grenoble.grid5000.fr': '172.16.20.5', 'dahu-6.grenoble.grid5000.fr': '172.16.20.6'}
-⠋ Launching remote kexec(s)⠙ Launching remote kexec(s)⠹ Launching remote kexec(s)⠸ Launching remote kexec(s)⠼ Launching remote kexec(s)⠴ Launching remote kexec(s)⠦ Launching remote kexec(s)⠧ Launching remote kexec(s)⠇ Launching remote kexec(s)⠏ Launching remote kexec(s)⠋ Launching remote kexec(s)⠙ Launching remote kexec(s)⠹ Launching remote kexec(s)⠸ Launching remote kexec(s)⠼ Launching remote kexec(s)⠴ Launching remote kexec(s)⠦ Launching remote kexec(s)⠧ Launching remote kexec(s)⠇ Launching remote kexec(s)⠏ Launching remote kexec(s)⠋ Launching remote kexec(s)⠙ Launching remote kexec(s)⠹ Launching remote kexec(s)⠸ Launching remote kexec(s)⠼ Launching remote kexec(s)✔ Remote kexec(s) launched
-⠋ Waiting ssh ports, opened: 0/6⠙ Waiting ssh ports, opened: 0/6⠹ Waiting ssh ports, opened: 0/6⠸ Waiting ssh ports, opened: 0/6⠼ Waiting ssh ports, opened: 0/6⠴ Waiting ssh ports, opened: 0/6⠦ Waiting ssh ports, opened: 0/6⠧ Waiting ssh ports, opened: 0/6⠇ Waiting ssh ports, opened: 0/6⠏ Waiting ssh ports, opened: 0/6⠋ Waiting ssh ports, opened: 0/6⠙ Waiting ssh ports, opened: 0/6⠹ Waiting ssh ports, opened: 0/6⠸ Waiting ssh ports, opened: 0/6⠼ Waiting ssh ports, opened: 0/6⠴ Waiting ssh ports, opened: 0/6⠦ Waiting ssh ports, opened: 0/6⠧ Waiting ssh ports, opened: 0/6⠇ Waiting ssh ports, opened: 0/6⠏ Waiting ssh ports, opened: 0/6⠋ Waiting ssh ports, opened: 0/6⠙ Waiting ssh ports, opened: 0/6⠹ Waiting ssh ports, opened: 0/6⠸ Waiting ssh ports, opened: 0/6⠼ Waiting ssh ports, opened: 0/6⠴ Waiting ssh ports, opened: 0/6⠦ Waiting ssh ports, opened: 0/6⠧ Waiting ssh ports, opened: 0/6⠇ Waiting ssh ports, opened: 0/6⠏ Waiting ssh ports, opened: 0/6⠋ Opened ssh ports: 0/6 (16.5s)⠙ Opened ssh ports: 0/6 (16.5s)⠹ Opened ssh ports: 0/6 (16.5s)⠸ Opened ssh ports: 0/6 (16.5s)⠼ Opened ssh ports: 0/6 (16.5s)⠴ Opened ssh ports: 0/6 (16.5s)⠦ Opened ssh ports: 0/6 (16.5s)⠧ Opened ssh ports: 0/6 (16.5s)⠇ Opened ssh ports: 0/6 (16.5s)⠏ Opened ssh ports: 0/6 (16.5s)⠋ Opened ssh ports: 0/6 (16.5s)⠙ Opened ssh ports: 0/6 (16.5s)⠹ Opened ssh ports: 0/6 (16.5s)⠸ Opened ssh ports: 0/6 (16.5s)⠼ Opened ssh ports: 0/6 (16.5s)⠴ Opened ssh ports: 0/6 (16.5s)⠦ Opened ssh ports: 0/6 (16.5s)⠧ Opened ssh ports: 0/6 (17.9s)⠇ Opened ssh ports: 0/6 (17.9s)⠏ Opened ssh ports: 0/6 (17.9s)⠋ Opened ssh ports: 0/6 (17.9s)⠙ Opened ssh ports: 0/6 (17.9s)⠹ Opened ssh ports: 0/6 (17.9s)⠸ Opened ssh ports: 0/6 (17.9s)⠼ Opened ssh ports: 0/6 (18.4s)⠴ Opened ssh ports: 0/6 (18.4s)⠦ Opened ssh ports: 0/6 (18.4s)⠧ Opened ssh ports: 0/6 (18.4s)⠇ Opened ssh ports: 0/6 (18.4s)⠏ Opened ssh ports: 0/6 (18.4s)⠋ Opened ssh ports: 0/6 (18.9s)⠙ Opened ssh ports: 0/6 (18.9s)⠹ Opened ssh ports: 0/6 (18.9s)⠸ Opened ssh ports: 0/6 (18.9s)⠼ Opened ssh ports: 0/6 (19.3s)⠴ Opened ssh ports: 0/6 (19.3s)⠦ Opened ssh ports: 0/6 (19.3s)⠧ Opened ssh ports: 0/6 (19.6s)⠇ Opened ssh ports: 0/6 (19.6s)⠏ Opened ssh ports: 0/6 (19.6s)⠋ Opened ssh ports: 0/6 (19.6s)⠙ Opened ssh ports: 0/6 (19.9s)⠹ Opened ssh ports: 0/6 (19.9s)⠸ Opened ssh ports: 0/6 (19.9s)⠼ Opened ssh ports: 0/6 (19.9s)⠴ Opened ssh ports: 0/6 (20.2s)⠦ Opened ssh ports: 0/6 (20.2s)⠧ Opened ssh ports: 0/6 (20.2s)⠇ Opened ssh ports: 0/6 (20.2s)⠏ Opened ssh ports: 0/6 (20.5s)⠋ Opened ssh ports: 0/6 (20.5s)⠙ Opened ssh ports: 0/6 (20.5s)⠹ Opened ssh ports: 0/6 (20.5s)⠸ Opened ssh ports: 0/6 (20.8s)⠼ Opened ssh ports: 0/6 (20.8s)⠴ Opened ssh ports: 0/6 (20.8s)⠦ Opened ssh ports: 0/6 (21.1s)⠧ Opened ssh ports: 0/6 (21.1s)⠇ Opened ssh ports: 0/6 (21.1s)⠏ Opened ssh ports: 0/6 (21.1s)⠋ Opened ssh ports: 0/6 (21.4s)⠙ Opened ssh ports: 0/6 (21.4s)⠹ Opened ssh ports: 0/6 (21.4s)⠸ Opened ssh ports: 0/6 (21.4s)⠼ Opened ssh ports: 0/6 (21.7s)⠴ Opened ssh ports: 0/6 (21.7s)⠦ Opened ssh ports: 0/6 (21.7s)⠧ Opened ssh ports: 0/6 (21.7s)⠇ Opened ssh ports: 0/6 (22.0s)⠏ Opened ssh ports: 0/6 (22.0s)⠋ Opened ssh ports: 0/6 (22.0s)⠙ Opened ssh ports: 0/6 (22.3s)⠹ Opened ssh ports: 0/6 (22.3s)⠸ Opened ssh ports: 0/6 (22.3s)⠼ Opened ssh ports: 0/6 (22.3s)⠴ Opened ssh ports: 0/6 (22.6s)⠦ Opened ssh ports: 0/6 (22.6s)⠧ Opened ssh ports: 0/6 (22.6s)⠇ Opened ssh ports: 0/6 (22.6s)⠏ Opened ssh ports: 0/6 (22.9s)⠋ Opened ssh ports: 0/6 (22.9s)⠙ Opened ssh ports: 0/6 (22.9s)⠹ Opened ssh ports: 0/6 (22.9s)⠸ Opened ssh ports: 0/6 (23.2s)⠼ Opened ssh ports: 0/6 (23.2s)⠴ Opened ssh ports: 0/6 (23.2s)⠦ Opened ssh ports: 0/6 (23.2s)⠧ Opened ssh ports: 0/6 (23.5s)⠇ Opened ssh ports: 0/6 (23.5s)⠏ Opened ssh ports: 0/6 (23.5s)⠋ Opened ssh ports: 0/6 (23.8s)⠙ Opened ssh ports: 0/6 (23.8s)⠹ Opened ssh ports: 0/6 (23.8s)⠸ Opened ssh ports: 0/6 (23.8s)⠼ Opened ssh ports: 0/6 (23.8s)⠴ Opened ssh ports: 0/6 (23.8s)⠦ Opened ssh ports: 0/6 (23.8s)⠧ Opened ssh ports: 0/6 (23.8s)⠇ Opened ssh ports: 0/6 (23.8s)⠏ Opened ssh ports: 0/6 (23.8s)⠋ Opened ssh ports: 0/6 (23.8s)⠙ Opened ssh ports: 0/6 (24.7s)⠹ Opened ssh ports: 0/6 (24.7s)⠸ Opened ssh ports: 0/6 (24.7s)⠼ Opened ssh ports: 0/6 (24.7s)⠴ Opened ssh ports: 0/6 (25.0s)⠦ Opened ssh ports: 0/6 (25.0s)⠧ Opened ssh ports: 0/6 (25.0s)⠇ Opened ssh ports: 0/6 (25.0s)⠏ Opened ssh ports: 0/6 (25.3s)⠋ Opened ssh ports: 0/6 (25.3s)⠙ Opened ssh ports: 0/6 (25.3s)⠹ Opened ssh ports: 0/6 (25.6s)⠸ Opened ssh ports: 0/6 (25.6s)⠼ Opened ssh ports: 0/6 (25.6s)⠴ Opened ssh ports: 0/6 (25.6s)⠦ Opened ssh ports: 0/6 (25.9s)⠧ Opened ssh ports: 0/6 (25.9s)⠇ Opened ssh ports: 0/6 (25.9s)⠏ Opened ssh ports: 0/6 (25.9s)⠋ Opened ssh ports: 0/6 (26.2s)⠙ Opened ssh ports: 0/6 (26.2s)⠹ Opened ssh ports: 0/6 (26.2s)⠸ Opened ssh ports: 0/6 (26.2s)⠼ Opened ssh ports: 0/6 (26.5s)⠴ Opened ssh ports: 0/6 (26.5s)⠦ Opened ssh ports: 0/6 (26.5s)⠧ Opened ssh ports: 0/6 (26.8s)⠇ Opened ssh ports: 0/6 (26.8s)⠏ Opened ssh ports: 0/6 (26.8s)⠋ Opened ssh ports: 0/6 (26.8s)⠙ Opened ssh ports: 0/6 (27.1s)⠹ Opened ssh ports: 0/6 (27.1s)⠸ Opened ssh ports: 0/6 (27.1s)⠼ Opened ssh ports: 0/6 (27.1s)⠴ Opened ssh ports: 0/6 (27.4s)⠦ Opened ssh ports: 0/6 (27.4s)⠧ Opened ssh ports: 0/6 (27.4s)⠇ Opened ssh ports: 0/6 (27.7s)⠏ Opened ssh ports: 0/6 (27.7s)⠋ Opened ssh ports: 0/6 (27.7s)⠙ Opened ssh ports: 0/6 (27.7s)⠹ Opened ssh ports: 0/6 (28.0s)⠸ Opened ssh ports: 0/6 (28.0s)⠼ Opened ssh ports: 0/6 (28.0s)⠴ Opened ssh ports: 0/6 (28.0s)⠦ Opened ssh ports: 0/6 (28.3s)⠧ Opened ssh ports: 0/6 (28.3s)⠇ Opened ssh ports: 0/6 (28.3s)⠏ Opened ssh ports: 0/6 (28.5s)⠋ Opened ssh ports: 0/6 (28.5s)⠙ Opened ssh ports: 0/6 (28.5s)⠹ Opened ssh ports: 0/6 (28.5s)⠸ Opened ssh ports: 0/6 (28.8s)⠼ Opened ssh ports: 0/6 (28.8s)⠴ Opened ssh ports: 0/6 (28.8s)⠦ Opened ssh ports: 0/6 (28.8s)⠧ Opened ssh ports: 0/6 (29.1s)⠇ Opened ssh ports: 0/6 (29.1s)⠏ Opened ssh ports: 0/6 (29.1s)⠋ Opened ssh ports: 0/6 (29.1s)⠙ Opened ssh ports: 0/6 (29.4s)⠹ Opened ssh ports: 0/6 (29.4s)⠸ Opened ssh ports: 0/6 (29.4s)⠼ Opened ssh ports: 0/6 (29.7s)⠴ Opened ssh ports: 0/6 (29.7s)⠦ Opened ssh ports: 0/6 (29.7s)⠧ Opened ssh ports: 0/6 (29.7s)⠇ Opened ssh ports: 0/6 (30.0s)⠏ Opened ssh ports: 0/6 (30.0s)⠋ Opened ssh ports: 0/6 (30.0s)⠙ Opened ssh ports: 0/6 (30.0s)⠹ Opened ssh ports: 0/6 (30.3s)⠸ Opened ssh ports: 0/6 (30.3s)⠼ Opened ssh ports: 0/6 (30.3s)⠴ Opened ssh ports: 0/6 (30.3s)⠦ Opened ssh ports: 0/6 (30.6s)⠧ Opened ssh ports: 0/6 (30.6s)⠇ Opened ssh ports: 0/6 (30.6s)⠏ Opened ssh ports: 0/6 (30.9s)⠋ Opened ssh ports: 0/6 (30.9s)⠙ Opened ssh ports: 0/6 (30.9s)⠹ Opened ssh ports: 0/6 (30.9s)⠸ Opened ssh ports: 0/6 (31.2s)⠼ Opened ssh ports: 0/6 (31.2s)⠴ Opened ssh ports: 0/6 (31.2s)⠦ Opened ssh ports: 0/6 (31.2s)⠧ Opened ssh ports: 0/6 (31.5s)⠇ Opened ssh ports: 0/6 (31.5s)⠏ Opened ssh ports: 0/6 (31.5s)⠋ Opened ssh ports: 0/6 (31.8s)⠙ Opened ssh ports: 0/6 (31.8s)⠹ Opened ssh ports: 0/6 (31.8s)⠸ Opened ssh ports: 0/6 (31.8s)⠼ Opened ssh ports: 0/6 (32.1s)⠴ Opened ssh ports: 0/6 (32.1s)⠦ Opened ssh ports: 0/6 (32.1s)⠧ Opened ssh ports: 0/6 (32.1s)⠇ Opened ssh ports: 0/6 (32.4s)⠏ Opened ssh ports: 0/6 (32.4s)⠋ Opened ssh ports: 0/6 (32.4s)⠙ Opened ssh ports: 0/6 (32.4s)⠹ Opened ssh ports: 0/6 (32.7s)⠸ Opened ssh ports: 0/6 (32.7s)⠼ Opened ssh ports: 0/6 (32.7s)⠴ Opened ssh ports: 0/6 (33.0s)⠦ Opened ssh ports: 0/6 (33.0s)⠧ Opened ssh ports: 0/6 (33.0s)⠇ Opened ssh ports: 0/6 (33.0s)⠏ Opened ssh ports: 0/6 (33.3s)⠋ Opened ssh ports: 0/6 (33.3s)⠙ Opened ssh ports: 0/6 (33.3s)⠹ Opened ssh ports: 0/6 (33.3s)⠸ Opened ssh ports: 0/6 (33.6s)⠼ Opened ssh ports: 0/6 (33.6s)⠴ Opened ssh ports: 0/6 (33.6s)⠦ Opened ssh ports: 0/6 (33.6s)⠧ Opened ssh ports: 0/6 (33.9s)⠇ Opened ssh ports: 0/6 (33.9s)⠏ Opened ssh ports: 0/6 (33.9s)⠋ Opened ssh ports: 1/6 (34.2s)⠙ Opened ssh ports: 1/6 (34.2s)⠹ Opened ssh ports: 1/6 (34.2s)⠸ Opened ssh ports: 1/6 (34.2s)⠼ Opened ssh ports: 3/6 (34.5s)⠴ Opened ssh ports: 3/6 (34.5s)⠦ Opened ssh ports: 3/6 (34.5s)⠧ Opened ssh ports: 3/6 (34.5s)⠇ Opened ssh ports: 3/6 (34.8s)⠏ Opened ssh ports: 3/6 (34.8s)⠋ Opened ssh ports: 3/6 (34.8s)⠙ Opened ssh ports: 3/6 (34.8s)⠹ Opened ssh ports: 4/6 (35.1s)⠸ Opened ssh ports: 4/6 (35.1s)⠼ Opened ssh ports: 4/6 (35.1s)⠴ Opened ssh ports: 5/6 (35.4s)⠦ Opened ssh ports: 5/6 (35.4s)⠧ Opened ssh ports: 5/6 (35.4s)⠇ Opened ssh ports: 5/6 (35.4s)⠏ Opened ssh ports: 6/6 (35.7s)⠋ Opened ssh ports: 6/6 (35.7s)⠙ Opened ssh ports: 6/6 (35.7s)✔ Deployment taken 36.0 sec
-Running embedded topology checks
-warning: Git tree '/home/msalmane/nxc-Exa-AtoW' is dirty
-error (ignored): error: package 'nixpkgs#bashInteractive' does not provide a 'bin/bash'
-run start command in
-additionally exposed symbols:
-    compute1, compute2, controller, ebservice, ebuffer, frontend,
-    ,
-    start_all, test_script, machines, driver, log, os, subtest, run_tests, join_all, retry, serial_stdout_off, serial_stdout_on, Machine
-ebuffer: must succeed: timeout 180 sh -c 'until systemctl is-active --quiet ebuffer.service; do sleep 1; done'
-(finished: must succeed: timeout 180 sh -c 'until systemctl is-active --quiet ebuffer.service; do sleep 1; done', in 0.30 seconds)
-ebservice: must succeed: timeout 180 sh -c 'until systemctl is-active --quiet ebservice.service && eb-login >/dev/null 2>&1; do sleep 1; done'
-(finished: must succeed: timeout 180 sh -c 'until systemctl is-active --quiet ebservice.service && eb-login >/dev/null 2>&1; do sleep 1; done', in 0.22 seconds)
-controller: must succeed: timeout 180 sh -c 'until systemctl is-active --quiet slurmctld.service; do sleep 1; done'
-(finished: must succeed: timeout 180 sh -c 'until systemctl is-active --quiet slurmctld.service; do sleep 1; done', in 0.06 seconds)
-compute1: must succeed: timeout 180 sh -c 'until systemctl is-active --quiet slurmd.service; do sleep 1; done'
-(finished: must succeed: timeout 180 sh -c 'until systemctl is-active --quiet slurmd.service; do sleep 1; done', in 0.05 seconds)
-compute2: must succeed: timeout 180 sh -c 'until systemctl is-active --quiet slurmd.service; do sleep 1; done'
-(finished: must succeed: timeout 180 sh -c 'until systemctl is-active --quiet slurmd.service; do sleep 1; done', in 0.06 seconds)
-frontend: must succeed: set -eu; systemctl start setup-openqcd-test.service; command -v ym1 >/dev/null; ! command -v mpi-hello >/dev/null; su - user1 -c 'cd /users/user1/openqcd-e2e && sbatch --wait openqcd-ym1.sbatch openqcd-ym1.in'; test -s /users/user1/openqcd-e2e/openqcd-e2e.log; test -s /users/user1/openqcd-e2e/openqcd-e2en1
-(finished: must succeed: set -eu; systemctl start setup-openqcd-test.service; command -v ym1 >/dev/null; ! command -v mpi-hello >/dev/null; su - user1 -c 'cd /users/user1/openqcd-e2e && sbatch --wait openqcd-ym1.sbatch openqcd-ym1.in'; test -s /users/user1/openqcd-e2e/openqcd-e2e.log; test -s /users/user1/openqcd-e2e/openqcd-e2en1, in 10.15 seconds)
-(finished: run start command in, in 10.84 seconds)
-Running openqcd API-to-SLURM E2E
-warning: Git tree '/home/msalmane/nxc-Exa-AtoW' is dirty
-error (ignored): error: package 'nixpkgs#bashInteractive' does not provide a 'bin/bash'
-2026-08-25 13:49:04,695 [INFO] [runtime] layer=service | microservice loop started
-2026-08-25 13:49:04,703 [INFO] [runtime] layer=service | look for new microservices
-2026-08-25 13:49:05,714 [INFO] [runtime] layer=service | look for new microservices
-2026-08-25 13:49:06,725 [INFO] [runtime] layer=service | look for new microservices
-2026-08-25 13:49:06,729 [INFO] [runtime] layer=service | create runner for nxc-e2e-openqcd (1af16dfa-1b73-40bc-bed7-06639a5d4b46)
-2026-08-25 13:49:06,729 [INFO] [runtime] layer=runner  | mservice=nxc-e2e-openqcd | runner loop started
-2026-08-25 13:49:06,735 [INFO] [runtime] layer=runner  | mservice=nxc-e2e-openqcd job=02f63049-ef04-44e8-a574-d6deec51de29 | starting worker thread
-2026-08-25 13:49:06,996 [INFO] [runtime] layer=job     | mservice=nxc-e2e-openqcd job=02f63049-ef04-44e8-a574-d6deec51de29 | set status running
-2026-08-25 13:49:07,004 [INFO] [runtime] layer=job     | mservice=nxc-e2e-openqcd job=02f63049-ef04-44e8-a574-d6deec51de29 | setup directories
-2026-08-25 13:49:07,705 [INFO] [runtime] layer=job     | mservice=nxc-e2e-openqcd job=02f63049-ef04-44e8-a574-d6deec51de29 | fetch inputs
-2026-08-25 13:49:07,705 [INFO] [runtime] layer=job     | mservice=nxc-e2e-openqcd job=02f63049-ef04-44e8-a574-d6deec51de29 | fetch ebuffer inputs
-2026-08-25 13:49:07,736 [INFO] [runtime] layer=service | look for new microservices
-2026-08-25 13:49:07,956 [INFO] [runtime] layer=job     | mservice=nxc-e2e-openqcd job=02f63049-ef04-44e8-a574-d6deec51de29 | preprocess
-2026-08-25 13:49:07,956 [INFO] [runtime] layer=job     | mservice=nxc-e2e-openqcd job=02f63049-ef04-44e8-a574-d6deec51de29 | create scheduler script
-2026-08-25 13:49:08,194 [INFO] [runtime] layer=job     | mservice=nxc-e2e-openqcd job=02f63049-ef04-44e8-a574-d6deec51de29 | execute and monitor
-2026-08-25 13:49:08,757 [INFO] [runtime] layer=service | look for new microservices
-2026-08-25 13:49:09,767 [INFO] [runtime] layer=service | look for new microservices
-2026-08-25 13:49:10,026 [INFO] [runtime] layer=job     | mservice=nxc-e2e-openqcd job=02f63049-ef04-44e8-a574-d6deec51de29 | push outputs
-2026-08-25 13:49:10,037 [INFO] [runtime] layer=job     | mservice=nxc-e2e-openqcd job=02f63049-ef04-44e8-a574-d6deec51de29 | push ebuffer outputs
-2026-08-25 13:49:10,280 [INFO] [runtime] layer=job     | mservice=nxc-e2e-openqcd job=02f63049-ef04-44e8-a574-d6deec51de29 | set status completed
-2026-08-25 13:49:10,535 [INFO] [runtime] layer=runner  | mservice=nxc-e2e-openqcd job=02f63049-ef04-44e8-a574-d6deec51de29 | thread cleaned up
-2026-08-25 13:49:10,777 [INFO] [runtime] layer=service | look for new microservices
-PENDING
-RUNNING
-COMPLETED
-E2E passed: API -> runtime -> two-node SLURM -> OpenQCD HMC
-Average plaquette: 0.034695
-Scheduler job:     2
-Scheduler ebuffer: 5db6c338-83e4-4ea0-9dd7-93113b9263cf (COMPLETED, exit 0:0)
-Output ebuffer:    35d653c3-00af-45bb-8194-aa9355c84dc2 (989 bytes)
-Returned openqcd-e2e.log:
-
-Simulation of the SU(3) gauge theory
-------------------------------------
-
-New run, start from random configuration
-
-Using the HMC algorithm
-Program version openQCD-2.0
-The machine is little endian
-8x4x4x4 lattice, 4x4x4x4 local lattice
-2x1x1x1 process grid, 1x1x1x1 process block size
-
-beta = 6.0
-c0 = 1.0, c1 = 0.0
-
-Periodic boundary conditions
-
-Random number generator:
-level = 0, seed = 73099
-
-Trajectories:
-tau = 0.1
-Leapfrog integrator
-Number of steps = 1
-
-nth = 1, ntr = 1
-dtr_log = 1, dtr_cnfg = 1
-
-Wilson flow observables are not measured
-
-The generated configurations are exported
-
-Total memory used = 1.0 MiB (= 520.6 KiB per MPI process)
-Global fields            =  35.7%
-MD fields                =  27.3%
-Communication buffers    =   9.3%
-Workspace                =  27.7%
-
-Trajectory no 1
-dH = -1.5e+00, iac = 1
-Average plaquette = 0.034695
-Acceptance rate = 1.000000
-Time per trajectory = 2.88e-03 sec (average = 2.88e-03 sec)
-
-Configuration no 1 exported in 8.21e-03 sec
-Releasing Grid'5000 reservation 3047325
-Deleting the job = 3047325 ...REGISTERED.
-The job(s) [ 3047325 ] will be deleted in the near future.

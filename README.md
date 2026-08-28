@@ -54,28 +54,24 @@ To integrate another application, follow the step-by-step
 [mdBook tutorial](docs/tutorial/quickstart.md).
 
 
-## Repository layers
+## Repository model
 
-The implementation keeps three responsibilities separate:
+The implementation uses the Nix-native progression from capabilities to
+compositions to evidence:
 
-| Layer | Location | Responsibility |
+| Concept | Location | Responsibility |
 | --- | --- | --- |
-| Shared infrastructure | `composition.nix` | Builds the role-neutral ebuffer, ebservice, shared-storage, Munge, and SLURM topology from injected modules and a test script. |
-| Workload software | `software/default.nix` | Maps each composition name to a uniform module selection or an explicit per-node software layout. |
-| Workload validation | `e2e/nxc/` and `e2e/*.py` | Supplies app-specific NXC tests and host-side API contracts while reusing common readiness and lifecycle code. |
+| Modules | `nix/modules/` | Reusable application capabilities with no composition identity. |
+| Profiles | `nix/profiles/default.nix` | Named module placement plus the NXC check proving that placement. |
+| Constructors | `nix/lib/` | Profile validation and assembly of the shared API, storage, and SLURM topology. |
+| Checks | `checks/nixos/` and `checks/host/` | In-topology assertions and host API-to-SLURM contracts. |
+| Tools | `tools/` | VM and Grid'5000 operational adapters used by the `justfile`. |
 
-`compositions.nix` joins the software and NXC-test catalogs and rejects
-mismatched keys. `e2e/nxc/common.nix` checks service and SLURM readiness before
-each app-specific NXC test. On the host side, `e2e/common.py` owns the shared
-API, SSH, scheduler, transfer, timeout, diagnostics, and cleanup lifecycle;
-`mpi_hello_e2e.py` and `openqcd_e2e.py` define only their application
-contracts.
-
-Adding an application requires a module in `software/` and its application
-tests. A composition selects one module, a uniform list, or explicit
-`frontendModules` and `computeNodes`, and has a matching entry in `e2e/nxc/`.
-Combined and heterogeneous compositions can reuse existing application
-contracts while providing composition-level NXC validation.
+There is one profile catalog, not separate software and test registries. A
+uniform profile declares `modules`; a heterogeneous profile declares
+`frontendModules` and `computeNodes`; every profile declares `check` beside its
+placement. `nix/lib/mk-compositions.nix` normalizes that schema and passes it to
+`nix/lib/mk-topology.nix`.
 
 
 
@@ -85,7 +81,7 @@ The default `just test` path:
 
 1. authenticates with ebservice;
 2. registers the OpenQCD microservice and compatible runtime;
-3. uploads `e2e/openqcd-ym1.in` and creates scheduler and output ebuffers;
+3. uploads `checks/host/openqcd-ym1.in` and creates scheduler and output ebuffers;
 4. submits a two-node SLURM job through the frontend;
 5. runs one `ym1` rank on each compute VM;
 6. returns `openqcd-e2e.log` through ebuffer;
@@ -141,7 +137,7 @@ just test multi-software-composition openqcd
 NXC. `just test` expects that composition's VM deployment to be running,
 establishes its tunnels, and launches the selected application's host E2E. Its
 second argument defaults to the composition name for single-application
-compositions. Use `just install` once to create `e2e/.venv` from the locked
+compositions. Use `just install` once to create `checks/host/.venv` from the locked
 dependencies.
 
 For the pinned NXC version, stop a VM deployment by interrupting its foreground

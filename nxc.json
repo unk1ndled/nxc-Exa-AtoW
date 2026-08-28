@@ -1,5 +1,5 @@
 {
-  "composition": "compositions.nix",
+  "composition": "nix/lib/mk-compositions.nix",
   "default_flavour": "vm",
   "flake": true
 }

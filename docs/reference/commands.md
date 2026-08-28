@@ -17,7 +17,7 @@ Run `just` with no arguments to list the available recipes. Defaults are
 | Command | Effect |
 | --- | --- |
 | `nix develop` | Enter the environment containing NXC, uv, jq, mdBook, and `e2e-fhs`. |
-| `just install` | Sync the locked Python dependencies into `e2e/.venv`. |
+| `just install` | Sync the locked Python dependencies into `checks/host/.venv`. |
 
 ## Build and deployment
 
@@ -78,7 +78,7 @@ by an optional application; the application defaults to the composition name.
 | --- | --- | --- |
 | `build/<workload>::<flavour>` | `nxc build` | Symlink to the built composition closure. |
 | `deploy/<workload>::<flavour>.json` | `nxc start` | Role and VM deployment metadata used by the tunnel. |
-| `e2e/.venv/` | `just install` | Locked host E2E environment. |
+| `checks/host/.venv/` | `just install` | Locked host-check environment. |
 | `book/` | `just docs` | Generated static documentation. |
 | `/tmp/nxc-exa-atow-tunnels-$UID/` | tunnel script | SSH control sockets and selected deployment state. |
 

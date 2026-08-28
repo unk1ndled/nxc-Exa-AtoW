@@ -1,37 +1,35 @@
-
 # Where to work
-## You are defining the architecture
 
-Start with `composition.nix`. Change it when the machine roles, node count,
-networking, shared storage, or SLURM layout changes. Change `flake.nix` only
-when the architecture needs a new pinned dependency or NixOS module.
+## You are adding a reusable capability
 
-## You are configuring a service
+Work under `nix/modules/applications/`. Modules install packages and configure
+their runtime environment, but do not choose machine names or composition
+identities.
 
-Work under `config/ebuffer/` or `config/ebservice/` for service settings. The
-NixOS role that enables each service remains in `composition.nix`.
+## You are defining a runnable system
 
-## You are adding a scientific workload
+Add or change an entry in `nix/profiles/default.nix`. A uniform profile uses
+`modules`; a heterogeneous profile uses `frontendModules` and `computeNodes`.
+The same profile entry selects its check, making placement and evidence one
+reviewable unit.
 
-Add its package module under `software/`, then register its name in
-`software/default.nix`. A composition value may be a single module or a list;
-every selected module is injected into the frontend and compute roles. Modules
-should not redefine the shared topology. For heterogeneous nodes, use an
-attribute set with `frontendModules` and `computeNodes`; every compute node
-declares its own `modules` and optional SLURM `features`.
+## You are changing shared infrastructure
 
-A composition is not complete until the same name is added under `e2e/nxc/`
-with checks for its selected software set. If an application is submitted
-through the APIs, also add its host-side contract and job INI under `e2e/`.
+Work in `nix/lib/mk-topology.nix` when machine roles, shared storage, Munge, or
+SLURM structure changes. `nix/lib/mk-compositions.nix` should contain only
+profile-schema validation and normalization. Change `flake.nix` for pinned
+dependencies, overlays, or upstream NixOS modules.
 
-## You are validating the architecture
+## You are validating a profile
 
-Use `e2e/nxc/common.nix` for readiness checks that every composition must pass.
-Put application fixtures and assertions in `e2e/nxc/<name>.nix`. Use the Python
-files under `e2e/` when testing the full path from the APIs to SLURM and back.
+Put NXC assertions in `checks/nixos/profiles/`; shared service and scheduler
+readiness belongs in `checks/nixos/with-readiness.nix`. Use `checks/host/` for
+the full API-to-SLURM workflow, application contracts, fixtures, and unit tests.
 
-## You are deploying or running it
+## You are adapting a deployment target
 
-Use the `justfile`; it is the supported entry point for normal operations.
-The helpers under `scripts/` expose a running local deployment and launch its
-host test. Operators normally do not need to edit the Nix modules.
+Use `tools/vm/` for local VM transport, `tools/grid5000/` for Grid'5000, and
+`tools/host/` for launchers shared across targets. These tools may adapt
+transport and lifecycle details, but must not redefine modules or profiles.
+
+Normal users should invoke these layers through the root `justfile`.

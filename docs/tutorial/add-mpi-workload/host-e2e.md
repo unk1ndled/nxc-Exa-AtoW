@@ -6,7 +6,7 @@ SSH tunnel, and validates the returned artifact.
 
 ## 5. Describe the API-to-SLURM job
 
-Create `e2e/mpi-calculator-job.ini`:
+Create `checks/host/mpi-calculator-job.ini`:
 
 ```ini
 [JOB]
@@ -31,18 +31,18 @@ modules =
 
 `app_name` and `app_dir` identify the executable inside the NixOS system
 profile. The shared lifecycle reads the resource section when constructing
-the remote job. Keep it consistent with both the batch example and the
+the remote job. Keep it consistent with both the batch fixture and the
 program's two-rank requirement.
 
 The calculator has no uploaded input file. Its operands are fixed test data in
 the application contract. For a program that consumes a mesh, parameter file,
-or dataset, list those paths in `input_files`; `e2e/common.py` will create input
+or dataset, list those paths in `input_files`; `checks/host/common.py` will create input
 ebuffers and stage their bytes in the remote job directory. The OpenQCD
 contract is the working example of that pattern.
 
 ## 6. Write the application-specific host contract
 
-Create `e2e/mpi_calculator_e2e.py`:
+Create `checks/host/mpi_calculator_e2e.py`:
 
 ```python
 import re
@@ -150,7 +150,7 @@ downloads output, and cleans up.
 
 ## 7. Register the host contract
 
-The `just test` path ends in `e2e/minimal-e2e.py`. Import the calculator and
+The `just test` path ends in `checks/host/run.py`. Import the calculator and
 add it to `APPLICATIONS`:
 
 ```python
@@ -174,7 +174,7 @@ You can confirm dispatcher registration without starting VMs:
 
 ```console
 $ nix develop --command e2e-fhs -c \
-    "uv run --project e2e python e2e/minimal-e2e.py --help"
+    "uv run --project checks/host python checks/host/run.py --help"
 ```
 
 The choices should now include `mpi-calculator`.

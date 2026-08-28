@@ -1,12 +1,12 @@
 # Write and package the application
 
 This chapter creates the two-rank calculator and makes it available as a NixOS
-workload module. It deliberately stops before adding the matching NXC test, so
-you can see where the repository enforces the package/test contract.
+application module. The following chapter adds a profile that places and
+validates it.
 
 ## 1. Write a tiny two-rank program
 
-Create `software/mpi-calculator.c`:
+Create `nix/modules/applications/mpi-calculator.c`:
 
 ```c
 #include <errno.h>
@@ -94,7 +94,7 @@ processes on one node.
 
 ## 2. Package and install the program with Nix
 
-Create `software/mpi-calculator.nix`:
+Create `nix/modules/applications/mpi-calculator.nix`:
 
 ```nix
 { pkgs, ... }:
@@ -130,28 +130,33 @@ available while Nix builds the C program. Importing `openmpi.nix` installs the
 MPI runtime in the machines and applies the TCP transport settings used by
 this VM topology.
 
-Do not import this module directly from `composition.nix`. That file owns the
-shared topology and must remain workload-neutral. The catalog selects which
-software module is injected into the frontend and compute roles.
+Do not import this module from `nix/lib/mk-topology.nix`. That constructor owns
+the shared topology and must remain application-neutral. Profiles select which
+modules are injected into frontend and compute roles.
 
-Add the new key to `software/default.nix`:
+The next chapter adds this profile entry to `nix/profiles/default.nix` once its
+check exists:
 
 ```nix
 {
-  mpi-calculator = ./mpi-calculator.nix;
-  mpi-hello = ./mpi-hello.nix;
-  openqcd = ./openqcd.nix;
+  mpi-calculator = {
+    modules = [ ../modules/applications/mpi-calculator.nix ];
+    check = import ../../checks/nixos/profiles/mpi-calculator.nix;
+  };
 }
 ```
 
-Catalog values may also be lists. Use that form when a composition should
-install several existing modules on every frontend and compute node:
+Use a profile's `modules` list when a composition installs several existing
+modules uniformly:
 
 ```nix
-multi-software-composition = [
-  ./mpi-hello.nix
-  ./openqcd.nix
-];
+multi-software-composition = {
+  modules = [
+    ../modules/applications/mpi-hello.nix
+    ../modules/applications/openqcd.nix
+  ];
+  check = import ../../checks/nixos/profiles/multi-software-composition.nix;
+};
 ```
 
 For node-local software, use the explicit form. Compute names must match
@@ -160,14 +165,14 @@ For node-local software, use the explicit form. Compute names must match
 ```nix
 heterogeneous-cluster = {
   frontendModules = [
-    ./mpi-hello.nix
-    ./openqcd.nix
+    ../modules/applications/mpi-hello.nix
+    ../modules/applications/openqcd.nix
   ];
   computeNodes = {
     compute1 = {
       modules = [
-        ./mpi-hello.nix
-        ./openqcd.nix
+        ../modules/applications/mpi-hello.nix
+        ../modules/applications/openqcd.nix
       ];
       features = [
         "mpi-hello"
@@ -175,10 +180,11 @@ heterogeneous-cluster = {
       ];
     };
     compute2 = {
-      modules = [ ./openqcd.nix ];
+      modules = [ ../modules/applications/openqcd.nix ];
       features = [ "openqcd" ];
     };
   };
+  check = import ../../checks/nixos/profiles/heterogeneous-cluster.nix;
 };
 ```
 
@@ -186,9 +192,7 @@ Users can target compatible nodes with `srun --constraint=openqcd ...` or an
 exact role with `srun --nodelist=compute1 ...`. Multi-node jobs require enough
 nodes that share the selected feature.
 
-When applying these changes incrementally, `just check` should fail at this
-moment because the test catalog does not yet contain `mpi-calculator`. That
-failure confirms that the catalog guard is working. The next chapter adds the
-missing test plug-in and restores successful evaluation.
+The module has no composition identity by itself. The next chapter creates the
+check and registers both placement and evidence in one profile declaration.
 
 Continue with [Test it through SLURM and NXC](slurm-and-nxc.md).

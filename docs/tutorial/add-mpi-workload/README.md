@@ -28,8 +28,8 @@ in-topology test, and a host-side application contract.
 Work through the chapters in order:
 
 1. [Write and package the application](program-and-package.md) creates the
-   MPI program, its Nix derivation, and the software catalog entry.
-2. [Test it through SLURM and NXC](slurm-and-nxc.md) adds a batch example and
+   MPI program and its reusable NixOS application module.
+2. [Test it through SLURM and NXC](slurm-and-nxc.md) adds a batch fixture and
    proves the package inside the six-machine topology.
 3. [Create the host E2E contract](host-e2e.md) connects the application to
    ebuffer, ebservice, the runtime worker, and output validation.
@@ -61,22 +61,22 @@ Choose the workload name before creating files. Here the composition name is
 `mpi_calculator_e2e.py`.
 
 ```text
-software/default.nix ─┐
-                     ├─> mpi-calculator::vm
-e2e/nxc/default.nix ──┘
+nix/modules/applications/mpi-calculator.nix ─┐
+checks/nixos/profiles/mpi-calculator.nix ────┤
+                                             ├─> nix/profiles/default.nix
+                                             └─> mpi-calculator::vm
 
 mpi-calculator::vm
-        ├─ package:       software/mpi-calculator.nix
-        ├─ NXC test:      e2e/nxc/mpi-calculator.nix
-        ├─ batch example: examples/mpi-calculator.sbatch
+        ├─ package:       nix/modules/applications/mpi-calculator.nix
+        ├─ NXC test:      checks/nixos/profiles/mpi-calculator.nix
+        ├─ batch fixture:  checks/nixos/jobs/mpi-calculator.sbatch
         └─ host contract:
-             e2e/mpi_calculator_e2e.py
-             e2e/mpi-calculator-job.ini
-             e2e/minimal-e2e.py
+             checks/host/mpi_calculator_e2e.py
+             checks/host/mpi-calculator-job.ini
+             checks/host/run.py
 ```
 
-The two Nix catalogs must contain exactly the same keys. This is intentional:
-`compositions.nix` refuses to evaluate a package that has no deployment test.
-That early failure is useful when a file has been added but not registered.
+There is one profile catalog. Its entry contains both module placement and the
+check proving that placement, so they are reviewed and evaluated together.
 
 Continue with [Write and package the application](program-and-package.md).

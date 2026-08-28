@@ -2,15 +2,15 @@
 
 ## Project Structure & Module Organization
 
-The NixOS-Compose topology lives in `composition.nix`; `compositions.nix` combines workload definitions from `software/` with in-topology tests from `e2e/nxc/`. Host-side API-to-SLURM scenarios are implemented in `e2e/common.py`, with application contracts in `e2e/mpi_hello_e2e.py` and `e2e/openqcd_e2e.py`. Service configuration belongs under `config/`, helper scripts under `scripts/`, and sample batch jobs under `examples/`. Documentation source is in `docs/`; `book/`, `build/`, and `deploy/` are generated outputs and should not be edited by hand.
+The repository follows Nix's modules/profiles/checks model. Reusable NixOS modules live in `nix/modules/`; `nix/profiles/default.nix` is the single composition catalog and owns both module placement and the profile's NXC check. `nix/lib/` validates profiles and constructs the shared topology. NXC checks and their batch-job fixtures live in `checks/nixos/`, while host API-to-SLURM checks and their locked Python environment live in `checks/host/`. Deployment helpers belong under `tools/`, and service data under `config/`. Documentation source is in `docs/`; `book/`, `build/`, and `deploy/` are generated outputs and should not be edited by hand.
 
-Treat software modules as reusable components, not composition identities: one composition may install one or several modules on its frontend and compute nodes. Catalog values in `software/default.nix` accept either a module or a list. Keep software-selection and E2E keys aligned, and provide composition-level validation for combined selections.
+Treat application modules as reusable capabilities, not composition identities: a profile may install one or several modules uniformly or assign them per compute node. Every entry in `nix/profiles/default.nix` must declare its NXC check alongside its placement. Keep deployment-specific behavior out of modules and composition-specific assertions out of the topology factory.
 
 ## Build, Test, and Development Commands
 
 Use the root `justfile` as the command entry point:
 
-- `just install` creates/synchronizes `e2e/.venv` from `e2e/uv.lock`.
+- `just install` creates/synchronizes `checks/host/.venv` from `checks/host/uv.lock`.
 - `just check` evaluates the flake and its outputs.
 - `just build vm mpi-hello` builds a selected composition; defaults are `vm` and `openqcd` (the argument is currently named `workload`).
 - `just up vm openqcd` starts the topology in the foreground.

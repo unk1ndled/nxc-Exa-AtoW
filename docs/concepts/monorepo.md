@@ -1,66 +1,62 @@
-# Monorepo: repository architecture 
-> WIP in progress WIP work in wip
+# Repository architecture
 
-This repository is a work in progress for describing and deploying desired
-scientific-computing architectures. A composition groups the machines,
-services, one or more software modules, and tests needed to reproduce one
-architecture.
-
-Today, `mpi-hello` and `openqcd` can run separately, together in
-`multi-software-composition`, or with different node-local availability in
-`heterogeneous-cluster`.
+This repository is organized around three Nix concepts: modules provide
+capabilities, profiles compose them into named systems, and checks provide
+evidence that those systems behave as declared.
 
 ## Repository map
 
 ```text
 .
-├── flake.nix                 Pins Nix packages and exposes NXC builds
-├── flake.lock                Records the exact dependency revisions
-├── nxc.json                  Points NXC to the composition catalog
+├── flake.nix                         Pins dependencies and exposes NXC builds
+├── nxc.json                          Selects the profile-generated catalog
 │
-├── composition.nix           Defines the shared machine topology
-├── compositions.nix          Joins each software selection to its matching test
+├── nix/
+│   ├── modules/applications/         Reusable application NixOS modules
+│   ├── profiles/default.nix          Composition names, placement, and checks
+│   └── lib/
+│       ├── mk-compositions.nix       Validates and evaluates every profile
+│       └── mk-topology.nix           Shared API, storage, and SLURM roles
 │
-├── software/                 Packages installed on frontend and compute nodes
-│   ├── default.nix           Uniform and per-node software catalog
-│   ├── openmpi.nix           MPI setup shared by the workloads
-│   ├── mpi-hello.nix         MPI hello package and environment
-│   └── openqcd.nix           OpenQCD package and environment
+├── checks/
+│   ├── nixos/
+│   │   ├── with-readiness.nix        Platform readiness shared by all profiles
+│   │   ├── profiles/                 Profile-specific NXC assertions
+│   │   └── jobs/                     Batch fixtures executed by those checks
+│   └── host/                         API-to-SLURM workflow and Python tests
 │
-├── config/                   Runtime configuration for the API services
-│   ├── ebuffer/              Data-buffer service configuration
-│   └── ebservice/            Job-service configuration
-│
-├── e2e/                      Evidence that a deployed architecture works
-│   ├── nxc/                  Tests run from inside an NXC deployment
-│   │   ├── default.nix       Test catalog; mirrors software/default.nix
-│   │   ├── common.nix        Checks shared by every workload
-│   │   ├── mpi-hello.nix     MPI hello deployment checks
-│   │   ├── openqcd.nix       OpenQCD deployment checks
-│   │   ├── multi-software-composition.nix  Combined checks
-│   │   └── heterogeneous-cluster.nix       Per-node checks
-│   ├── common.py             Shared host-side job lifecycle
-│   ├── minimal-e2e.py        Selects the workload contract
-│   ├── *_e2e.py              Workload-specific API and output checks
-│   └── *-job.ini             Workload command and SLURM resources
-│
-├── examples/                 Batch scripts for direct SLURM use
-├── scripts/                  Tunnelling and host E2E launch helpers
-└── justfile                  Commands used to build, run, and test
+├── config/                           Data supplied to upstream service modules
+├── tools/
+│   ├── host/                         Host-check launcher
+│   ├── vm/                           Local VM adapters
+│   └── grid5000/                     Grid'5000 adapters
+└── justfile                          Stable user-facing commands
 ```
 
-The two catalogs are the main assembly point:
+## Composition flow
 
 ```text
-software/default.nix: <name> = <uniform modules> or <per-node layout>
-        +
-e2e/nxc/<name>.nix
-        +
-composition.nix
-        =
-<name>::<deployment flavour>
+nix/modules/applications/*.nix
+             │
+             ▼
+nix/profiles/default.nix ────── checks/nixos/profiles/*.nix
+             │                         │
+             └──────────┬──────────────┘
+                        ▼
+            nix/lib/mk-compositions.nix
+                        │
+                        ▼
+              nix/lib/mk-topology.nix
+                        │
+                        ▼
+             <profile>::<NXC flavour>
 ```
 
-`software/default.nix` and `e2e/nxc/default.nix` must expose the same
-composition names. Evaluation fails when a software selection has no matching
-deployment test.
+A profile is the only public composition declaration. Uniform profiles select
+`modules`; heterogeneous profiles select `frontendModules` and explicit
+`computeNodes`. Every profile declares its `check` in the same attribute set,
+so module placement cannot drift away from its validation catalog.
+
+The shared topology enables the ebuffer and ebservice modules exported by the
+locked `exaAtowPkgs` input. This repository supplies deployment values and
+configuration data; it does not duplicate upstream service lifecycle logic.

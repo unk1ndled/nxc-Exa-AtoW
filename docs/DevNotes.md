@@ -6,14 +6,14 @@ ebuffer, drives a runtime worker, and reaches the frontend through local SSH
 forwarding. A single-software composition can use the same application name in
 both paths; a combined composition selects its host application separately.
 
-## Validation follows the repository layers
+## Validation follows modules and profiles
 
-`composition.nix` is only an infrastructure factory. `compositions.nix`
-normalizes the uniform or per-node selection from `software/default.nix` and
-joins it with the identically named plug-in from `e2e/nxc/default.nix`.
-Evaluation fails if the software-selection and NXC-test catalog keys differ.
+`nix/lib/mk-topology.nix` is the infrastructure constructor.
+`nix/lib/mk-compositions.nix` normalizes each declaration from the single
+`nix/profiles/default.nix` catalog. A profile owns its application placement
+and NXC check together; evaluation fails when either is missing.
 
-`e2e/nxc/common.nix` waits for ebuffer, ebservice, login, the SLURM controller,
+`checks/nixos/with-readiness.nix` waits for ebuffer, ebservice, login, the SLURM controller,
 and every declared compute daemon. Single-software NXC plug-ins also check isolation.
 The combined plug-in stages both fixtures and submits both two-node batch jobs,
 which proves that both executables are present on the compute nodes. It
@@ -32,7 +32,7 @@ SSH subprocesses once at the end because NXC unconditionally sends a final
 daemon flag: six nodes enable it automatically, but the local VM path never
 creates the daemon that cleanup otherwise tries to stop.
 
-The host path uses `e2e/common.py` for the shared API, RemoteManager, SLURM,
+The host path uses `checks/host/common.py` for the shared API, RemoteManager, SLURM,
 ebuffer transfer, timeout, diagnostics, and cleanup lifecycle. Application
 modules export small contracts:
 
@@ -42,7 +42,7 @@ modules export small contracts:
   checks the lattice, process grid, trajectory, configuration export, and
   plaquette.
 
-`minimal-e2e.py` is the catalog dispatcher used by `scripts/run-e2e.sh`; it
+`checks/host/run.py` is the catalog dispatcher used by `tools/host/run-e2e.sh`; it
 does not implement another workload lifecycle. App-specific resource requests
 live in `mpi-hello-job.ini` and `openqcd-job.ini`, while
 `minimal-hpc.ini` remains the shared connection configuration.
@@ -57,13 +57,13 @@ It contains Bash, SSH, rsync, uv, and the basic tools needed by the test.
 Ideally RemoteManager would resolve Bash from `PATH`, accept an executable
 path, or avoid shell fallbacks. Failed commands can leave randomly named
 eight-hex-digit `.sh` files and `remotemanager.log` behind. The launcher runs
-from `e2e/` so those artifacts do not pollute the repository root.
+from `checks/host/` so those artifacts do not pollute the repository root.
 
 ## VM ports and workload switching
 
 NXC records VM IDs and roles in `deploy/openqcd::vm.json` or
 `deploy/mpi-hello::vm.json`, but allocated host SSH ports are recovered by
-inspecting QEMU command lines. `scripts/tunnel.sh` matches the VM ID encoded in
+inspecting QEMU command lines. `tools/vm/tunnel.sh` matches the VM ID encoded in
 the MAC address and extracts its `hostfwd` port. This works for the current NXC
 VM flavour but depends on its implementation details.
 
@@ -86,7 +86,7 @@ through a local forwarded port with a chosen SSH key. Configuring
 `127.0.0.1` as the host also makes RemoteManager classify it as local
 execution and skip SSH.
 
-`TunnelRemoteExecutor` in `e2e/common.py` therefore uses the logical
+`NxcRemoteExecutor` in `checks/host/common.py` therefore uses the logical
 `nxc-frontend` host while overriding SSH to connect to `127.0.0.1:2222` with
 the selected identity and noninteractive host-key options.
 

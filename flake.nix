@@ -33,7 +33,7 @@
       };
       composed = nxc.lib.compose {
         inherit nixpkgs system;
-        compositions = import ./compositions.nix;
+        compositions = import ./nix/lib/mk-compositions.nix;
         overlays = [ exaAtowPkgs.overlays.default ];
         extraConfigurations = [ exaAtowPkgs.nixosModules.default ];
       };

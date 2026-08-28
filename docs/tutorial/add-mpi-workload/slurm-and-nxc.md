@@ -1,12 +1,12 @@
 # Test it through SLURM and NXC
 
 Before involving the APIs, prove the calculator through the scheduler. This
-chapter creates an operator-friendly batch example, then uses it in the
+chapter creates a directly runnable batch fixture, then uses it in the
 self-contained NXC integration test.
 
-## 3. Make a direct SLURM example
+## 3. Make a directly runnable SLURM fixture
 
-Create `examples/mpi-calculator.sbatch`:
+Create `checks/nixos/jobs/mpi-calculator.sbatch`:
 
 ```bash
 #!/usr/bin/env bash
@@ -47,11 +47,11 @@ The NXC layer answers a focused question: after NixOS Compose has booted the
 machines, can a normal frontend user submit this program through SLURM and get
 a meaningful result on shared storage?
 
-Create `e2e/nxc/mpi-calculator.nix`:
+Create `checks/nixos/profiles/mpi-calculator.nix`:
 
 ```nix
 let
-  job = ../../examples/mpi-calculator.sbatch;
+  job = ../jobs/mpi-calculator.sbatch;
   testDir = "/users/user1/mpi-calculator-e2e";
 in
 {
@@ -103,25 +103,24 @@ A combined composition instead checks every selected executable. The test then
 submits as `user1`; running as root would hide ownership and login-environment
 mistakes.
 
-Register the test in `e2e/nxc/default.nix` alongside the existing entries:
+Register placement and its check together in `nix/profiles/default.nix`:
 
 ```nix
-in
 {
-  mpi-calculator = withCommon (import ./mpi-calculator.nix);
-  mpi-hello = withCommon (import ./mpi-hello.nix { });
-  multi-software-composition = withCommon (import ./multi-software-composition.nix);
-  openqcd = withCommon (import ./openqcd.nix { });
+  mpi-calculator = {
+    modules = [ ../modules/applications/mpi-calculator.nix ];
+    check = import ../../checks/nixos/profiles/mpi-calculator.nix;
+  };
 }
 ```
 
-Keep the existing `common`, `finalize`, and `withCommon` definitions around
-this attribute set unchanged. `withCommon` prepends service and SLURM
-readiness checks, then appends the NXC VM-runner compatibility finalizer.
+`nix/lib/mk-compositions.nix` automatically wraps the selected check with
+`checks/nixos/with-readiness.nix`.
 
 Adding a third package also strengthens the isolation contract of the two
-existing tests. Add this command to both `e2e/nxc/mpi-hello.nix` and
-`e2e/nxc/openqcd.nix` before they submit their jobs:
+existing tests. Add this command to both
+`checks/nixos/profiles/mpi-hello.nix` and
+`checks/nixos/profiles/openqcd.nix` before they submit their jobs:
 
 ```nix
 "! command -v mpi-calculator >/dev/null; "
