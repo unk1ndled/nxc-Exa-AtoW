@@ -2,9 +2,15 @@
 
 ## Project Structure & Module Organization
 
-The NixOS-Compose topology lives in `composition.nix`; `compositions.nix` combines workload definitions from `software/` with in-topology tests from `e2e/nxc/`. Host-side API-to-SLURM scenarios are implemented in `e2e/common.py`, with application contracts in `e2e/mpi_hello_e2e.py` and `e2e/openqcd_e2e.py`. Service configuration belongs under `config/`, helper scripts under `scripts/`, and sample batch jobs under `examples/`. Documentation source is in `docs/`; `book/`, `build/`, and `deploy/` are generated outputs and should not be edited by hand.
+`topology.nix` defines the shared cluster (ebuffer, ebservice, SLURM, shared storage) and the readiness checks run before every test. `compositions.nix` turns each directory under `apps/` into a composition, and each file under `compositions/` into a combined or per-node composition. An app directory holds its NixOS module (`default.nix`), sources, SLURM job, and NXC test (`test.nix`); shared modules such as `apps/openmpi.nix` sit beside them. Service configuration belongs under `config/`, helper scripts under `scripts/`. `e2e/` is an optional Python client for the ebservice API path. Documentation source is in `docs/`; `book/`, `build/`, and `deploy/` are generated outputs and should not be edited by hand.
 
-Treat software modules as reusable components, not composition identities: one composition may install one or several modules on its frontend and compute nodes. Catalog values in `software/default.nix` accept either a module or a list. Keep software-selection and E2E keys aligned, and provide composition-level validation for combined selections.
+## Design Invariants
+
+- Human readability comes first. Prefer the plain, obvious version over defensive or clever machinery; a new contributor should follow one app from its Nix module to its NXC test without reading Python.
+- Nix is the package manager and configuration language, NXC is the orchestration and test layer. Building, deploying, and testing must not require any other client, language runtime, or package manager.
+- Clients such as the Python ebsclient E2E are optional. Apps must not depend on them; they may read from `apps/`, never the reverse.
+- Wrappers (`justfile`, `scripts/`) exist to save effort. Each `just` recipe should stay a short, readable call to `nix` or `nxc`; do not add wrapper layers that become necessary to understand the project.
+- Keep each concept under one name and in one place. Workarounds for upstream bugs are labelled as such, next to the code they affect.
 
 ## Build, Test, and Development Commands
 
@@ -24,7 +30,7 @@ Follow surrounding style: four-space indentation and type hints in Python; two-s
 
 ## Testing Guidelines
 
-There is no documented coverage threshold. Run `just check` for Nix changes and the relevant `just nxc-test` and `just test` for topology, software, or E2E changes. E2E modules are executable scenario drivers rather than conventional `test_*.py` suites; validation failures should raise clear `RuntimeError` messages. Run `just docs` after documentation or navigation changes.
+There is no documented coverage threshold. Run `just check` for Nix changes and the relevant `just nxc-test` for topology or app changes. Run `just test` only when changing the optional `e2e/` client. Run `just docs` after documentation or navigation changes.
 
 ## Commit & Pull Request Guidelines
 
