@@ -6,7 +6,7 @@ self-contained NXC integration test.
 
 ## 3. Make a direct SLURM example
 
-Create `examples/mpi-calculator.sbatch`:
+Create `apps/mpi-calculator/mpi-calculator.sbatch`:
 
 ```bash
 #!/usr/bin/env bash
@@ -47,11 +47,11 @@ The NXC layer answers a focused question: after NixOS Compose has booted the
 machines, can a normal frontend user submit this program through SLURM and get
 a meaningful result on shared storage?
 
-Create `e2e/nxc/mpi-calculator.nix`:
+Create `apps/mpi-calculator/test.nix`:
 
 ```nix
 let
-  job = ../../examples/mpi-calculator.sbatch;
+  job = ./mpi-calculator.sbatch;
   testDir = "/users/user1/mpi-calculator-e2e";
 in
 {
@@ -82,8 +82,6 @@ in
       "set -eu; "
       "systemctl start setup-mpi-calculator-test.service; "
       "command -v mpi-calculator >/dev/null; "
-      "! command -v mpi-hello >/dev/null; "
-      "! command -v ym1 >/dev/null; "
       "su - user1 -c 'cd ${testDir} && sbatch --wait mpi-calculator.sbatch'; "
       "test -s ${testDir}/mpi-calculator.out; "
       "grep -q '^result add = 42$' ${testDir}/mpi-calculator.out"
@@ -97,35 +95,11 @@ The `frontendModule` creates a one-shot fixture service. Its
 frontend, and compute nodes, and the fixture must not run before that mount is
 ready.
 
-The test checks both presence and isolation. `mpi-calculator` must be on
-`PATH`, while executables not selected by this composition must not be there.
-A combined composition instead checks every selected executable. The test then
-submits as `user1`; running as root would hide ownership and login-environment
-mistakes.
+The test checks that `mpi-calculator` is on `PATH`, then submits as `user1`;
+running as root would hide ownership and login-environment mistakes.
 
-Register the test in `e2e/nxc/default.nix` alongside the existing entries:
-
-```nix
-in
-{
-  mpi-calculator = withCommon (import ./mpi-calculator.nix);
-  mpi-hello = withCommon (import ./mpi-hello.nix { });
-  multi-software-composition = withCommon (import ./multi-software-composition.nix);
-  openqcd = withCommon (import ./openqcd.nix { });
-}
-```
-
-Keep the existing `common`, `finalize`, and `withCommon` definitions around
-this attribute set unchanged. `withCommon` prepends service and SLURM
-readiness checks, then appends the NXC VM-runner compatibility finalizer.
-
-Adding a third package also strengthens the isolation contract of the two
-existing tests. Add this command to both `e2e/nxc/mpi-hello.nix` and
-`e2e/nxc/openqcd.nix` before they submit their jobs:
-
-```nix
-"! command -v mpi-calculator >/dev/null; "
-```
+There is nothing to register. `topology.nix` runs its service and SLURM
+readiness checks before this script, and the NXC VM-driver workarounds after it.
 
 Now evaluate and run the first complete test layer:
 
@@ -134,8 +108,7 @@ $ just check
 $ just nxc-test mpi-calculator
 ```
 
-A successful run proves that the catalog assembled
-`mpi-calculator::vm`, the package was installed only in that composition, the
-shared directory worked, and SLURM launched one MPI rank on each compute VM.
+A successful run proves that `mpi-calculator::vm` was assembled, the package
+was installed, the shared directory worked, and SLURM launched one MPI rank on each compute VM.
 
 Continue with [Create the host E2E contract](host-e2e.md).

@@ -168,7 +168,7 @@ APPLICATIONS = {
 ```
 
 No `justfile`, tunnel script, composition factory, or flake change is needed.
-Those pieces already accept a workload selected from the closed catalogs.
+Those pieces already accept any app name.
 
 You can confirm dispatcher registration without starting VMs:
 

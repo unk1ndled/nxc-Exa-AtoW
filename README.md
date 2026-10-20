@@ -56,28 +56,15 @@ To integrate another application, follow the step-by-step
 
 ## Repository layers
 
-The implementation keeps three responsibilities separate:
-
 | Layer | Location | Responsibility |
 | --- | --- | --- |
-| Shared infrastructure | `composition.nix` | Builds the role-neutral ebuffer, ebservice, shared-storage, Munge, and SLURM topology from injected modules and a test script. |
-| Workload software | `software/default.nix` | Maps each composition name to a uniform module selection or an explicit per-node software layout. |
-| Workload validation | `e2e/nxc/` and `e2e/*.py` | Supplies app-specific NXC tests and host-side API contracts while reusing common readiness and lifecycle code. |
+| Shared infrastructure | `topology.nix` | Builds the ebuffer, ebservice, shared-storage, Munge, and SLURM topology from injected modules, and waits for it to be ready before each test. |
+| Apps | `apps/<name>/` | One NixOS module, its sources, a SLURM job, and an NXC test per app. Each directory becomes a composition. |
+| Combined compositions | `compositions/` | Compositions that install several apps, uniformly or per compute node. |
+| Optional API client | `e2e/` | Python client that drives a job through ebservice and ebuffer. Not needed to build, deploy, or run the NXC tests. |
 
-`compositions.nix` joins the software and NXC-test catalogs and rejects
-mismatched keys. `e2e/nxc/common.nix` checks service and SLURM readiness before
-each app-specific NXC test. On the host side, `e2e/common.py` owns the shared
-API, SSH, scheduler, transfer, timeout, diagnostics, and cleanup lifecycle;
-`mpi_hello_e2e.py` and `openqcd_e2e.py` define only their application
-contracts.
-
-Adding an application requires a module in `software/` and its application
-tests. A composition selects one module, a uniform list, or explicit
-`frontendModules` and `computeNodes`, and has a matching entry in `e2e/nxc/`.
-Combined and heterogeneous compositions can reuse existing application
-contracts while providing composition-level NXC validation.
-
-
+To add an application, create `apps/<name>/` following the
+[tutorial](docs/tutorial/quickstart.md).
 
 ## End-to-end behavior
 
@@ -85,7 +72,7 @@ The default `just test` path:
 
 1. authenticates with ebservice;
 2. registers the OpenQCD microservice and compatible runtime;
-3. uploads `e2e/openqcd-ym1.in` and creates scheduler and output ebuffers;
+3. uploads `apps/openqcd/openqcd-ym1.in` and creates scheduler and output ebuffers;
 4. submits a two-node SLURM job through the frontend;
 5. runs one `ym1` rank on each compute VM;
 6. returns `openqcd-e2e.log` through ebuffer;

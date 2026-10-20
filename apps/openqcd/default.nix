@@ -1,5 +1,5 @@
 { pkgs, ... }:
 {
-  imports = [ ./openmpi.nix ];
+  imports = [ ../openmpi.nix ];
   environment.systemPackages = [ pkgs.openQCD ];
 }

@@ -18,49 +18,36 @@ Today, `mpi-hello` and `openqcd` can run separately, together in
 ├── flake.lock                Records the exact dependency revisions
 ├── nxc.json                  Points NXC to the composition catalog
 │
-├── composition.nix           Defines the shared machine topology
-├── compositions.nix          Joins each software selection to its matching test
+├── topology.nix              The shared cluster: services, SLURM, readiness checks
+├── compositions.nix          Turns apps/ and compositions/ into NXC compositions
 │
-├── software/                 Packages installed on frontend and compute nodes
-│   ├── default.nix           Uniform and per-node software catalog
-│   ├── openmpi.nix           MPI setup shared by the workloads
-│   ├── mpi-hello.nix         MPI hello package and environment
-│   └── openqcd.nix           OpenQCD package and environment
+├── apps/                     One directory per app; each becomes a composition
+│   ├── openmpi.nix           MPI setup shared by the apps
+│   ├── mpi-hello/
+│   │   ├── default.nix       NixOS module: package and environment
+│   │   ├── mpi-hello.c       Source
+│   │   ├── mpi-hello.sbatch  SLURM job, usable directly with sbatch
+│   │   └── test.nix          NXC test: job fixture and assertions
+│   └── openqcd/              Same shape, plus the openqcd-ym1.in input
+│
+├── compositions/             Compositions that combine several apps
+│   ├── multi-software-composition.nix  Both apps on every node
+│   └── heterogeneous-cluster.nix       Different apps per compute node
 │
 ├── config/                   Runtime configuration for the API services
 │   ├── ebuffer/              Data-buffer service configuration
 │   └── ebservice/            Job-service configuration
 │
-├── e2e/                      Evidence that a deployed architecture works
-│   ├── nxc/                  Tests run from inside an NXC deployment
-│   │   ├── default.nix       Test catalog; mirrors software/default.nix
-│   │   ├── common.nix        Checks shared by every workload
-│   │   ├── mpi-hello.nix     MPI hello deployment checks
-│   │   ├── openqcd.nix       OpenQCD deployment checks
-│   │   ├── multi-software-composition.nix  Combined checks
-│   │   └── heterogeneous-cluster.nix       Per-node checks
-│   ├── common.py             Shared host-side job lifecycle
-│   ├── minimal-e2e.py        Selects the workload contract
-│   ├── *_e2e.py              Workload-specific API and output checks
-│   └── *-job.ini             Workload command and SLURM resources
-│
-├── examples/                 Batch scripts for direct SLURM use
+├── e2e/                      Optional Python client for the ebservice API path
 ├── scripts/                  Tunnelling and host E2E launch helpers
 └── justfile                  Commands used to build, run, and test
 ```
 
-The two catalogs are the main assembly point:
+Compositions are assembled without a hand-maintained catalog:
 
 ```text
-software/default.nix: <name> = <uniform modules> or <per-node layout>
-        +
-e2e/nxc/<name>.nix
-        +
-composition.nix
-        =
-<name>::<deployment flavour>
+apps/<name>/default.nix + apps/<name>/test.nix + topology.nix = <name>::<flavour>
+compositions/<name>.nix                        + topology.nix = <name>::<flavour>
 ```
 
-`software/default.nix` and `e2e/nxc/default.nix` must expose the same
-composition names. Evaluation fails when a software selection has no matching
-deployment test.
+Adding a directory under `apps/` is enough to get a new composition.

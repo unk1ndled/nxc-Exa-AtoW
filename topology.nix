@@ -1,16 +1,11 @@
+# The shared cluster: ebuffer, ebservice, a SLURM frontend and controller,
+# and the compute nodes a composition declares. Apps are injected as modules.
 {
-  frontendModules ? [ ],
-  computeNodes ? {
-    compute1 = {
-      modules = [ ];
-      features = [ ];
-    };
-    compute2 = {
-      modules = [ ];
-      features = [ ];
-    };
-  },
-  testScript ? "",
+  frontendModules,
+  computeNodes,
+  # Frontend modules that only the test needs, such as job fixtures.
+  testModules ? [ ],
+  testScript,
 }:
 { pkgs, ... }:
 let
@@ -22,7 +17,7 @@ let
   slurmNodeNames = builtins.map (
     nodeName:
     let
-      features = computeNodes.${nodeName}.features;
+      features = computeNodes.${nodeName}.features or [ ];
       featureConfig =
         if features == [ ] then "" else " Feature=${builtins.concatStringsSep "," features}";
     in
@@ -64,6 +59,30 @@ let
       nxc.sharedDirs."/users".server = "controller";
     }
   ) computeNodes;
+
+  waitFor = machine: unit: ''
+    ${machine}.succeed(
+      "timeout 180 sh -c 'until systemctl is-active --quiet ${unit}; do sleep 1; done'"
+    )
+  '';
+  waitForCluster =
+    "serial_stdout_off()\n"
+    + waitFor "ebuffer" "ebuffer.service"
+    + waitFor "ebservice" "ebservice.service && eb-login >/dev/null 2>&1"
+    + waitFor "controller" "slurmctld.service"
+    + builtins.concatStringsSep "" (builtins.map (node: waitFor node "slurmd.service") computeNodeNames);
+
+  # Workarounds for the pinned NXC VM driver, appended after every test:
+  # - each machine's SSH subprocess accepts one command, and NXC sends a final
+  #   `sync` after the test, so the subprocesses are restarted;
+  # - more than four nodes enables an HTTP daemon that the local VM path never
+  #   creates, so cleanup would call stop() on None.
+  nxcWorkarounds = ''
+    if driver.ctx.flavour.name == "vm":
+        for machine in machines:
+            machine.ctx.flavour.start_process_shell(machine)
+        driver.ctx.use_httpd = False
+  '';
 in
 if computeNodeNames == [ ] then
   builtins.throw "a composition must declare at least one compute node"
@@ -123,7 +142,7 @@ else
       frontend =
         { ... }:
         {
-          imports = [ clusterBase ] ++ frontendModules;
+          imports = [ clusterBase ] ++ frontendModules ++ testModules;
           services.slurm.enableStools = true;
           nxc.sharedDirs."/users".server = "controller";
         };
@@ -138,5 +157,5 @@ else
     }
     // computeRoles;
 
-    inherit testScript;
+    testScript = waitForCluster + testScript + nxcWorkarounds;
   }

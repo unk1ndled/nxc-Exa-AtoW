@@ -21,6 +21,6 @@ let
   };
 in
 {
-  imports = [ ./openmpi.nix ];
+  imports = [ ../openmpi.nix ];
   environment.systemPackages = [ mpiHello ];
 }

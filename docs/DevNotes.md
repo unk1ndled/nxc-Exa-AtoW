@@ -8,25 +8,24 @@ both paths; a combined composition selects its host application separately.
 
 ## Validation follows the repository layers
 
-`composition.nix` is only an infrastructure factory. `compositions.nix`
-normalizes the uniform or per-node selection from `software/default.nix` and
-joins it with the identically named plug-in from `e2e/nxc/default.nix`.
-Evaluation fails if the software-selection and NXC-test catalog keys differ.
+`topology.nix` builds the shared infrastructure. `compositions.nix` turns
+every directory under `apps/` into a composition with that app on all nodes,
+and every file under `compositions/` into a combined or per-node composition.
 
-`e2e/nxc/common.nix` waits for ebuffer, ebservice, login, the SLURM controller,
-and every declared compute daemon. Single-software NXC plug-ins also check isolation.
-The combined plug-in stages both fixtures and submits both two-node batch jobs,
-which proves that both executables are present on the compute nodes. It
-refreshes the frontend SSH subprocess between the two application checks.
-The heterogeneous plug-in verifies node-local package isolation and SLURM
-features, then runs OpenQCD across the two nodes that advertise it.
+`topology.nix` waits for ebuffer, ebservice, login, the SLURM controller, and
+every declared compute daemon before the app test runs. The combined
+composition stages both fixtures and submits both two-node batch jobs, which
+proves that both executables are present on the compute nodes. It refreshes the
+frontend SSH subprocess between the two application checks. The heterogeneous
+composition verifies node-local package isolation and SLURM features, then
+runs OpenQCD across the two nodes that advertise it.
 
 The pinned NXC VM driver's SSH process accepts only one command per machine
 during `nxc start -t`; a second call tries to reuse an already-communicated
 Python subprocess. The shared test therefore performs each role's retry loop
 inside one shell command, and each app uses one frontend command. Workload
 execution and detailed validation remain in the maintained batch scripts, not
-in a long sequence of driver stages. The E2E catalog refreshes those managed
+in a long sequence of driver stages. `topology.nix` refreshes those managed
 SSH subprocesses once at the end because NXC unconditionally sends a final
 `sync` command after the embedded test. The same finalizer clears NXC's HTTP
 daemon flag: six nodes enable it automatically, but the local VM path never

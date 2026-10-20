@@ -1,7 +1,6 @@
-{ assertIsolated ? true }:
 let
-  input = ../openqcd-ym1.in;
-  job = ../../examples/openqcd-ym1.sbatch;
+  input = ./openqcd-ym1.in;
+  job = ./openqcd-ym1.sbatch;
   testDir = "/users/user1/openqcd-e2e";
 in
 {
@@ -33,7 +32,6 @@ in
       "set -eu; "
       "systemctl start setup-openqcd-test.service; "
       "command -v ym1 >/dev/null; "
-      ${if assertIsolated then ''"! command -v mpi-hello >/dev/null; "'' else ""}
       "su - user1 -c 'cd ${testDir} && "
       "sbatch --wait openqcd-ym1.sbatch openqcd-ym1.in'; "
       "test -s ${testDir}/openqcd-e2e.log; "

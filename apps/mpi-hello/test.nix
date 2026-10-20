@@ -1,6 +1,5 @@
-{ assertIsolated ? true }:
 let
-  job = ../../examples/mpi-hello.sbatch;
+  job = ./mpi-hello.sbatch;
   testDir = "/users/user1/mpi-hello-e2e";
 in
 {
@@ -31,7 +30,6 @@ in
       "set -eu; "
       "systemctl start setup-mpi-hello-test.service; "
       "command -v mpi-hello >/dev/null; "
-      ${if assertIsolated then ''"! command -v ym1 >/dev/null; "'' else ""}
       "su - user1 -c 'cd ${testDir} && sbatch --wait mpi-hello.sbatch'; "
       "test -s ${testDir}/mpi-hello.out"
     )

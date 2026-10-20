@@ -13,7 +13,7 @@
 set -euo pipefail
 
 submit_dir="${SLURM_SUBMIT_DIR:-$PWD}"
-input_file="${1:-e2e/openqcd-ym1.in}"
+input_file="${1:-openqcd-ym1.in}"
 if [[ "$input_file" != /* ]]; then
     input_file="$submit_dir/$input_file"
 fi
