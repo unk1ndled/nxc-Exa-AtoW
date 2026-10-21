@@ -2,7 +2,7 @@
 
 ## Project Structure & Module Organization
 
-`topology.nix` defines the shared cluster (ebuffer, ebservice, SLURM, shared storage) and the readiness checks run before every test. `compositions.nix` turns each directory under `apps/` into a composition, and each file under `compositions/` into a combined or per-node composition. An app directory holds its NixOS module (`default.nix`), sources, SLURM job, and NXC test (`test.nix`); shared modules such as `apps/openmpi.nix` sit beside them. Service configuration belongs under `config/`, helper scripts under `scripts/`. `e2e/` is an optional Python client for the ebservice API path. Documentation source is in `docs/`; `book/`, `build/`, and `deploy/` are generated outputs and should not be edited by hand.
+`topology.nix` defines the shared cluster (ebuffer, ebservice, SLURM, shared storage) and the readiness checks run before every test. Each app under `apps/` is a NixOS module with an `exa-atow.apps.<name>.enable` option (plus `testFixtures` for its NXC test inputs); `apps/default.nix` lists them, and shared modules such as `apps/openmpi.nix` sit beside them. `compositions.nix` lists every composition as per-node configuration that enables apps; compute nodes advertise their enabled apps as SLURM features. An app directory holds its module (`default.nix`), sources, SLURM job, and NXC test script (`test.nix`). Service configuration belongs under `config/`, helper scripts under `scripts/`. `e2e/` is an optional Python client for the ebservice API path. Documentation source is in `docs/`; `book/`, `build/`, and `deploy/` are generated outputs and should not be edited by hand.
 
 ## Design Invariants
 

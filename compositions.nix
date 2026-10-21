@@ -1,52 +1,88 @@
-# Every directory in apps/ becomes a composition that installs that app on the
-# frontend and on two compute nodes. Each file in compositions/ adds a
-# composition that combines several apps or lays them out per node.
+# Every composition. Each node is plain NixOS configuration that enables the
+# apps it should run; see apps/default.nix for the available apps.
 let
   topology = import ./topology.nix;
-
-  directoryNames =
-    path:
-    let
-      entries = builtins.readDir path;
-    in
-    builtins.filter (name: entries.${name} == "directory") (builtins.attrNames entries);
-
-  # An app directory holds a NixOS module (default.nix) and its NXC test (test.nix).
-  apps = builtins.listToAttrs (
-    builtins.map (name: {
-      inherit name;
-      value = {
-        module = ./apps + "/${name}";
-        test = import (./apps + "/${name}/test.nix");
-      };
-    }) (directoryNames ./apps)
-  );
-
-  # The same modules on the frontend and on two identical compute nodes.
-  uniform = modules: {
-    frontendModules = modules;
-    computeNodes = {
-      compute1.modules = modules;
-      compute2.modules = modules;
+  mpiHelloTest = import ./apps/mpi-hello/test.nix;
+  openqcdTest = import ./apps/openqcd/test.nix;
+in
+{
+  mpi-hello = topology {
+    frontend.exa-atow.apps.mpi-hello = {
+      enable = true;
+      testFixtures = true;
     };
+    computeNodes = {
+      compute1.exa-atow.apps.mpi-hello.enable = true;
+      compute2.exa-atow.apps.mpi-hello.enable = true;
+    };
+    testScript = mpiHelloTest.testScript;
   };
 
-  appCompositions = builtins.mapAttrs (
-    _name: app:
-    topology (
-      uniform [ app.module ]
-      // {
-        testModules = [ app.test.frontendModule ];
-        inherit (app.test) testScript;
-      }
-    )
-  ) apps;
+  openqcd = topology {
+    frontend.exa-atow.apps.openqcd = {
+      enable = true;
+      testFixtures = true;
+    };
+    computeNodes = {
+      compute1.exa-atow.apps.openqcd.enable = true;
+      compute2.exa-atow.apps.openqcd.enable = true;
+    };
+    testScript = openqcdTest.testScript;
+  };
 
-  combinedCompositions = builtins.listToAttrs (
-    builtins.map (file: {
-      name = builtins.replaceStrings [ ".nix" ] [ "" ] file;
-      value = topology (import (./compositions + "/${file}") { inherit apps uniform; });
-    }) (builtins.attrNames (builtins.readDir ./compositions))
-  );
-in
-appCompositions // combinedCompositions
+  # Both apps on every node; both two-node jobs must pass.
+  multi-software-composition = topology {
+    frontend.exa-atow.apps = {
+      mpi-hello = {
+        enable = true;
+        testFixtures = true;
+      };
+      openqcd = {
+        enable = true;
+        testFixtures = true;
+      };
+    };
+    computeNodes = {
+      compute1.exa-atow.apps = {
+        mpi-hello.enable = true;
+        openqcd.enable = true;
+      };
+      compute2.exa-atow.apps = {
+        mpi-hello.enable = true;
+        openqcd.enable = true;
+      };
+    };
+    testScript = mpiHelloTest.testScript + openqcdTest.testScript;
+  };
+
+  # Different software per compute node. OpenQCD runs on both nodes; MPI Hello
+  # is installed only on compute1.
+  heterogeneous-cluster = topology {
+    frontend.exa-atow.apps = {
+      mpi-hello.enable = true;
+      openqcd = {
+        enable = true;
+        testFixtures = true;
+      };
+    };
+    computeNodes = {
+      compute1.exa-atow.apps = {
+        mpi-hello.enable = true;
+        openqcd.enable = true;
+      };
+      compute2.exa-atow.apps.openqcd.enable = true;
+    };
+    testScript = openqcdTest.testScript + ''
+      compute1.succeed("command -v mpi-hello")
+      compute1.succeed("command -v ym1")
+      compute2.fail("command -v mpi-hello")
+      compute2.succeed("command -v ym1")
+      controller.succeed(
+        "scontrol show node compute1 --oneliner | grep -Eq 'AvailableFeatures=[^ ]*mpi-hello'"
+      )
+      controller.succeed(
+        "scontrol show node compute2 --oneliner | grep -Eq 'AvailableFeatures=openqcd([[:space:]]|$)'"
+      )
+    '';
+  };
+}

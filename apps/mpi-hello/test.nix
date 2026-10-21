@@ -1,37 +1,12 @@
-let
-  job = ./mpi-hello.sbatch;
+# Runs on the frontend once the cluster is ready. Needs
+# `exa-atow.apps.mpi-hello.testFixtures = true` on the frontend.
+rec {
   testDir = "/users/user1/mpi-hello-e2e";
-in
-{
-  frontendModule =
-    { ... }:
-    {
-      systemd.services.setup-mpi-hello-test = {
-        description = "Populate the MPI Hello integration-test directory";
-        wantedBy = [ "multi-user.target" ];
-        after = [ "remote-fs.target" ];
-        unitConfig.RequiresMountsFor = "/users";
-        serviceConfig = {
-          Type = "oneshot";
-          RemainAfterExit = true;
-        };
-        script = ''
-          rm -rf "${testDir}"
-          mkdir -p "${testDir}"
-          cp "${job}" "${testDir}/mpi-hello.sbatch"
-          chmod 0755 "${testDir}/mpi-hello.sbatch"
-          chown -R user1:users "${testDir}"
-        '';
-      };
-    };
 
   testScript = ''
-    frontend.succeed(
-      "set -eu; "
-      "systemctl start setup-mpi-hello-test.service; "
-      "command -v mpi-hello >/dev/null; "
-      "su - user1 -c 'cd ${testDir} && sbatch --wait mpi-hello.sbatch'; "
-      "test -s ${testDir}/mpi-hello.out"
-    )
+    frontend.succeed("systemctl start setup-mpi-hello-test.service")
+    frontend.succeed("command -v mpi-hello")
+    frontend.succeed("su - user1 -c 'cd ${testDir} && sbatch --wait mpi-hello.sbatch'")
+    frontend.succeed("test -s ${testDir}/mpi-hello.out")
   '';
 }

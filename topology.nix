@@ -1,10 +1,9 @@
 # The shared cluster: ebuffer, ebservice, a SLURM frontend and controller,
-# and the compute nodes a composition declares. Apps are injected as modules.
+# and the compute nodes a composition declares. `frontend` and each compute
+# node are NixOS configuration that enables apps from ./apps.
 {
-  frontendModules,
+  frontend,
   computeNodes,
-  # Frontend modules that only the test needs, such as job fixtures.
-  testModules ? [ ],
   testScript,
 }:
 { pkgs, ... }:
@@ -17,7 +16,9 @@ let
   slurmNodeNames = builtins.map (
     nodeName:
     let
-      features = computeNodes.${nodeName}.features or [ ];
+      # Each node advertises the apps it enables as SLURM features.
+      apps = computeNodes.${nodeName}.exa-atow.apps or { };
+      features = builtins.filter (app: apps.${app}.enable or false) (builtins.attrNames apps);
       featureConfig =
         if features == [ ] then "" else " Feature=${builtins.concatStringsSep "," features}";
     in
@@ -54,7 +55,11 @@ let
     _nodeName: node:
     { ... }:
     {
-      imports = [ clusterBase ] ++ node.modules;
+      imports = [
+        clusterBase
+        ./apps
+        node
+      ];
       services.slurm.client.enable = true;
       nxc.sharedDirs."/users".server = "controller";
     }
@@ -130,7 +135,11 @@ else
       frontend =
         { ... }:
         {
-          imports = [ clusterBase ] ++ frontendModules ++ testModules;
+          imports = [
+            clusterBase
+            ./apps
+            frontend
+          ];
           services.slurm.enableStools = true;
           nxc.sharedDirs."/users".server = "controller";
         };
