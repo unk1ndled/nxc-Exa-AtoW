@@ -54,7 +54,7 @@ cd "$repository_root"
 echo "Building $composition"
 run_in_nix_shell nxc build -f "$flavour" -C "$composition"
 
-compose_info="build/$composition"
+compose_info="build/$composition.json"
 node_count=$(
   run_in_nix_shell jq -er --arg workload "$workload" \
     '.compositions_info[$workload].roles | length' \

@@ -4,7 +4,7 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/25.05";
     exaAtowPkgs.url = "git+https://gricad-gitlab.univ-grenoble-alpes.fr/exa-atow/exa-atow-nix-pkgs.git";
-    nxc.url = "git+https://gitlab.inria.fr/nixos-compose/nixos-compose.git?ref=25.05";
+    nxc.url = "git+https://gitlab.inria.fr/nixos-compose/nixos-compose.git?ref=main";
   };
 
   outputs =
@@ -39,9 +39,12 @@
       };
     in
     {
-      packages.${system} = composed // {
+      # NXC adds a non-derivation compositionsNames list, which `nxc build`
+      # without -C reads; packages must contain only derivations.
+      packages.${system} = builtins.removeAttrs composed [ "compositionsNames" ] // {
         default = composed."openqcd::vm";
       };
+      legacyPackages.${system}.compositionsNames = composed.compositionsNames;
       devShells.${system}.default = pkgs.mkShell {
         inputsFrom = [ nxc.devShells.${system}.nxcShell ];
         packages = [

@@ -131,10 +131,9 @@ second argument defaults to the composition name for single-application
 compositions. Use `just install` once to create `e2e/.venv` from the locked
 dependencies.
 
-For the pinned NXC version, stop a VM deployment by interrupting its foreground
-`just up` process with Ctrl-C. Its standalone VM stop path calls a missing
-`VmFlavour.cleanup()` method; `just down` remains available for flavours such
-as Docker that implement cleanup.
+Stop a VM deployment by interrupting its foreground `just up` process with
+Ctrl-C. NXC's VM flavour has no standalone cleanup, so `just down` does not stop
+VMs; it remains available for flavours that implement cleanup.
 
 
 

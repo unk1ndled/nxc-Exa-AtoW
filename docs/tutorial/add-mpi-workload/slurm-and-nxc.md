@@ -99,7 +99,7 @@ The test checks that `mpi-calculator` is on `PATH`, then submits as `user1`;
 running as root would hide ownership and login-environment mistakes.
 
 There is nothing to register. `topology.nix` runs its service and SLURM
-readiness checks before this script, and the NXC VM-driver workarounds after it.
+readiness checks before this script.
 
 Now evaluate and run the first complete test layer:
 

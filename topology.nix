@@ -71,18 +71,6 @@ let
     + waitFor "ebservice" "ebservice.service && eb-login >/dev/null 2>&1"
     + waitFor "controller" "slurmctld.service"
     + builtins.concatStringsSep "" (builtins.map (node: waitFor node "slurmd.service") computeNodeNames);
-
-  # Workarounds for the pinned NXC VM driver, appended after every test:
-  # - each machine's SSH subprocess accepts one command, and NXC sends a final
-  #   `sync` after the test, so the subprocesses are restarted;
-  # - more than four nodes enables an HTTP daemon that the local VM path never
-  #   creates, so cleanup would call stop() on None.
-  nxcWorkarounds = ''
-    if driver.ctx.flavour.name == "vm":
-        for machine in machines:
-            machine.ctx.flavour.start_process_shell(machine)
-        driver.ctx.use_httpd = False
-  '';
 in
 if computeNodeNames == [ ] then
   builtins.throw "a composition must declare at least one compute node"
@@ -157,5 +145,5 @@ else
     }
     // computeRoles;
 
-    testScript = waitForCluster + testScript + nxcWorkarounds;
+    testScript = waitForCluster + testScript;
   }

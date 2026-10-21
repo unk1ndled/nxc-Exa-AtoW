@@ -58,19 +58,8 @@ while IFS=$'\t' read -r vm_id role; do
     *) continue ;;
   esac
 
-  padded_id=$(printf '%02d' "$vm_id")
-  ssh_port=$(
-    ps aux \
-      | grep "[m]ac=52:54:00:12:01:${padded_id}" \
-      | sed -nE 's/.*hostfwd=tcp::([0-9]+)-:22.*/\1/p' \
-      | head -n 1 \
-      || true
-  )
-
-  if [[ -z "$ssh_port" ]]; then
-    echo "skip $role: VM is not running" >&2
-    continue
-  fi
+  # NXC forwards each VM's SSH to host port 22021 + vm_id.
+  ssh_port=$((22021 + vm_id))
 
   remote_port="$service_port"
   if [[ "$role" == frontend ]]; then

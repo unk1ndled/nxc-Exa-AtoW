@@ -43,9 +43,8 @@ Job IDs, UUIDs, output sizes, and the mapping of ranks to compute host names
 will vary. The important facts are a successful terminal SLURM record, the
 result 42, ranks 0 and 1, and two distinct hosts.
 
-Return to the first terminal and press Ctrl-C to stop the VM deployment. For
-the pinned NXC version, the VM flavour does not implement the standalone
-cleanup used by `just down`; Ctrl-C is the supported local path.
+Return to the first terminal and press Ctrl-C to stop the VM deployment. NXC's
+VM flavour has no standalone cleanup, so `just down` does not stop VMs.
 
 ## 9. Debug the first failures
 

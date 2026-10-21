@@ -47,9 +47,9 @@ the variable is unset. To add other QEMU options, include the CPU choice:
 $ QEMU_OPTS="-cpu host <other-options>" just up vm mpi-hello
 ```
 
-For the pinned NXC release, stop VM deployments with Ctrl-C in the foreground
-`just up` terminal. `just down vm ...` reaches an unimplemented
-`VmFlavour.cleanup()` path.
+Stop VM deployments with Ctrl-C in the foreground `just up` terminal.
+`just down vm ...` does nothing, because NXC's VM flavour has no standalone
+cleanup.
 
 ## Tests and tunnels
 
@@ -76,7 +76,7 @@ by an optional application; the application defaults to the composition name.
 
 | Path | Producer | Purpose |
 | --- | --- | --- |
-| `build/<workload>::<flavour>` | `nxc build` | Symlink to the built composition closure. |
+| `build/<workload>::<flavour>.json` | `nxc build` | Description of the built composition. |
 | `deploy/<workload>::<flavour>.json` | `nxc start` | Role and VM deployment metadata used by the tunnel. |
 | `e2e/.venv/` | `just install` | Locked host E2E environment. |
 | `book/` | `just docs` | Generated static documentation. |

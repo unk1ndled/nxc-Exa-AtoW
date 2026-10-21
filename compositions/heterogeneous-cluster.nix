@@ -28,8 +28,6 @@ in
 
   testModules = [ openqcd.test.frontendModule ];
   testScript = openqcd.test.testScript + ''
-    for machine in [compute1, compute2, controller]:
-        machine.ctx.flavour.start_process_shell(machine)
     compute1.succeed(
       "command -v mpi-hello >/dev/null; command -v ym1 >/dev/null"
     )

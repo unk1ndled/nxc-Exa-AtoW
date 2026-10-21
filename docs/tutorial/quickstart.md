@@ -133,9 +133,9 @@ validator requires ranks 0 and 1 to name two different compute hosts.
 
 Return to terminal 1 and press Ctrl-C to stop the VM deployment.
 
-> Do not use `just down vm mpi-hello` for this pinned NXC release. Its VM
-> flavour lacks the standalone cleanup method used by `nxc stop`; Ctrl-C on
-> the foreground `just up` process is the supported local stop path.
+> `just down vm mpi-hello` does not stop VMs: NXC's VM flavour has no
+> standalone cleanup. Ctrl-C on the foreground `just up` process is the
+> supported local stop path.
 
 ## 3. Try the scientific workload
 

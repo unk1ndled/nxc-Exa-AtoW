@@ -15,21 +15,12 @@ and every file under `compositions/` into a combined or per-node composition.
 `topology.nix` waits for ebuffer, ebservice, login, the SLURM controller, and
 every declared compute daemon before the app test runs. The combined
 composition stages both fixtures and submits both two-node batch jobs, which
-proves that both executables are present on the compute nodes. It refreshes the
-frontend SSH subprocess between the two application checks. The heterogeneous
+proves that both executables are present on the compute nodes. The heterogeneous
 composition verifies node-local package isolation and SLURM features, then
 runs OpenQCD across the two nodes that advertise it.
 
-The pinned NXC VM driver's SSH process accepts only one command per machine
-during `nxc start -t`; a second call tries to reuse an already-communicated
-Python subprocess. The shared test therefore performs each role's retry loop
-inside one shell command, and each app uses one frontend command. Workload
-execution and detailed validation remain in the maintained batch scripts, not
-in a long sequence of driver stages. `topology.nix` refreshes those managed
-SSH subprocesses once at the end because NXC unconditionally sends a final
-`sync` command after the embedded test. The same finalizer clears NXC's HTTP
-daemon flag: six nodes enable it automatically, but the local VM path never
-creates the daemon that cleanup otherwise tries to stop.
+Workload execution and detailed validation stay in the maintained batch
+scripts, not in a long sequence of driver stages.
 
 The host path uses `e2e/common.py` for the shared API, RemoteManager, SLURM,
 ebuffer transfer, timeout, diagnostics, and cleanup lifecycle. Application
@@ -151,9 +142,6 @@ portability.
 
 ## Standalone VM stop is missing upstream
 
-The pinned NXC `stop` command calls `cleanup()` on the selected flavour, but
-its `VmFlavour` does not implement that method. Consequently,
-`just down vm [workload]` raises an attribute error instead of stopping the
-foreground VM driver. Stop VM deployments with Ctrl-C in the terminal running
-`just up`; `just down` remains valid for implemented cleanup paths such as the
-Docker flavour.
+NXC's `stop` command calls `cleanup()` on the selected flavour, and the VM
+flavour's `cleanup()` does nothing, so `just down vm [workload]` leaves the VMs
+running. Stop VM deployments with Ctrl-C in the terminal running `just up`.

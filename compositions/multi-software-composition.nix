@@ -12,12 +12,5 @@ uniform [
     mpi-hello.test.frontendModule
     openqcd.test.frontendModule
   ];
-  # The pinned NXC VM driver accepts one command per machine SSH subprocess,
-  # so the frontend channel is restarted before the second app's test.
-  testScript =
-    mpi-hello.test.testScript
-    + ''
-      frontend.ctx.flavour.start_process_shell(frontend)
-    ''
-    + openqcd.test.testScript;
+  testScript = mpi-hello.test.testScript + openqcd.test.testScript;
 }
