@@ -85,9 +85,9 @@ If you also use the optional host client:
 
 | Concern | File |
 | --- | --- |
-| Host resource contract | `e2e/mpi-calculator-job.ini` |
-| Host behavior contract | `e2e/mpi_calculator_e2e.py` |
-| Host dispatcher | Import and entry in `e2e/minimal-e2e.py` |
+| Host resource contract | `clients/python-e2e/mpi-calculator-job.ini` |
+| Host behavior contract | `clients/python-e2e/mpi_calculator_e2e.py` |
+| Host dispatcher | Import and entry in `clients/python-e2e/minimal-e2e.py` |
 
 Finish with:
 
@@ -99,7 +99,7 @@ $ just test mpi-calculator
 ```
 
 If the change affects shared MPI configuration, SLURM resources, shared
-storage, tunnels, the API services, or `e2e/common.py`, also run both existing
+storage, tunnels, the API services, or `clients/python-e2e/common.py`, also run both existing
 workloads when practical. Shared infrastructure can pass the calculator while
 breaking a file-heavy scientific application such as OpenQCD.
 
@@ -109,7 +109,7 @@ The calculator keeps source beside its Nix module, which is convenient for a
 small demonstrator. A real application can instead use a pinned Nix package,
 an overlay package, or a derivation that fetches a released source archive.
 Keep the same boundary: package and runtime settings belong under
-`apps/<name>/`, not in `topology.nix`.
+`apps/<name>/`, not in `cluster/topology.nix`.
 
 Likewise, replace the fixed operands with representative input files and
 validate scientific meaning rather than only process exit status. Good E2E

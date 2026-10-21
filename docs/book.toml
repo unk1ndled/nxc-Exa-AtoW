@@ -4,19 +4,19 @@ authors = ["unk1ndled"]
 description = "Architecture and tutorials for the Exa-AToW NixOS Compose demonstrator"
 language = "en"
 multilingual = false
-src = "docs"
+src = "src"
 
 [build]
 build-dir = "book"
 create-missing = false
 
 [output.html]
-additional-css = ["docs/theme/custom.css"]
+additional-css = ["theme/custom.css"]
 default-theme = "light"
 preferred-dark-theme = "navy"
 git-repository-url = "https://github.com/unk1ndled/nxc-Exa-AtoW"
 git-repository-icon = "fa-github"
-edit-url-template = "https://github.com/unk1ndled/nxc-Exa-AtoW/edit/main/{path}"
+edit-url-template = "https://github.com/unk1ndled/nxc-Exa-AtoW/edit/main/docs/{path}"
 
 [output.html.fold]
 enable = true

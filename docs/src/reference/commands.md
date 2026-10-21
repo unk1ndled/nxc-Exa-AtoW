@@ -8,7 +8,7 @@ Run `just` with no arguments to list the available recipes. Defaults are
 | Command | Effect |
 | --- | --- |
 | `just check` | Evaluate the flake and validate its outputs with `nix flake check`. |
-| `just docs` | Build this mdBook into `book/`. |
+| `just docs` | Build this mdBook into `docs/book/`. |
 | `just docs-serve` | Serve the book on `127.0.0.1:3000` with live reload. |
 | `just docs-serve 0.0.0.0 4000` | Override the documentation host and port. Exposing beyond loopback is your responsibility. |
 
@@ -17,7 +17,7 @@ Run `just` with no arguments to list the available recipes. Defaults are
 | Command | Effect |
 | --- | --- |
 | `nix develop` | Enter the environment containing NXC, uv, jq, mdBook, and `e2e-fhs`. |
-| `just install` | Sync the locked Python dependencies into `e2e/.venv`. |
+| `just install` | Sync the locked Python dependencies into `clients/python-e2e/.venv`. |
 
 ## Build and deployment
 
@@ -78,8 +78,8 @@ by an optional application; the application defaults to the composition name.
 | --- | --- | --- |
 | `build/<workload>::<flavour>.json` | `nxc build` | Description of the built composition. |
 | `deploy/<workload>::<flavour>.json` | `nxc start` | Role and VM deployment metadata used by the tunnel. |
-| `e2e/.venv/` | `just install` | Locked host E2E environment. |
-| `book/` | `just docs` | Generated static documentation. |
+| `clients/python-e2e/.venv/` | `just install` | Locked host E2E environment. |
+| `docs/book/` | `just docs` | Generated static documentation. |
 | `/tmp/nxc-exa-atow-tunnels-$UID/` | tunnel script | SSH control sockets and selected deployment state. |
 
 Generated repository paths are ignored by Git.

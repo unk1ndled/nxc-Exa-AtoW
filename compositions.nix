@@ -1,7 +1,7 @@
 # Every composition. Each node is plain NixOS configuration that enables the
 # apps it should run; see apps/default.nix for the available apps.
 let
-  topology = import ./topology.nix;
+  topology = import ./cluster/topology.nix;
   mpiHelloTest = import ./apps/mpi-hello/test.nix;
   openqcdTest = import ./apps/openqcd/test.nix;
 in

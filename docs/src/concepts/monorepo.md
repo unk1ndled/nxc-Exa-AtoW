@@ -18,7 +18,6 @@ Today, `mpi-hello` and `openqcd` can run separately, together in
 ├── flake.lock                Records the exact dependency revisions
 ├── nxc.json                  Points NXC to the composition catalog
 │
-├── topology.nix              The shared cluster: services, SLURM, readiness checks
 ├── compositions.nix          Every composition: which apps each node enables
 │
 ├── apps/                     One directory per app
@@ -31,14 +30,26 @@ Today, `mpi-hello` and `openqcd` can run separately, together in
 │   │   └── test.nix          NXC test script
 │   └── openqcd/              Same shape, plus the openqcd-ym1.in input
 │
-├── config/                   Runtime configuration for the API services
+├── cluster/                  The shared platform, the same for every app
+│   ├── topology.nix          Services, SLURM, shared storage, readiness checks
 │   ├── ebuffer/              Data-buffer service configuration
 │   └── ebservice/            Job-service configuration
 │
-├── e2e/                      Optional Python client for the ebservice API path
-├── scripts/                  Tunnelling and host E2E launch helpers
+├── clients/                  Optional; nothing outside reads from here
+│   └── python-e2e/           Python client for the ebservice API path, with
+│                             its launch scripts
+├── scripts/                  Client-neutral helpers (tunnel.sh)
+├── docs/                     This book: book.toml, src/, generated book/
 └── justfile                  Commands used to build, run, and test
 ```
+
+Each root folder has one job. The root itself holds only files a tool expects
+there (`flake.nix`, `flake.lock`, `nxc.json`, `justfile`) plus
+`compositions.nix`, the list of what can be built. Anything every composition
+gets goes in `cluster/`, each workload in `apps/`, anything that drives a
+running deployment from outside in `clients/`, and helpers that work without
+any client in `scripts/`. NXC writes `build/` and `deploy/` into the working
+directory.
 
 Every machine imports every app module; each app is off until a composition
 enables it:
@@ -46,7 +57,7 @@ enables it:
 ```text
 apps/<name>/  (module with exa-atow.apps.<name>.enable)
   + compositions.nix  (which nodes enable which apps, which test runs)
-  + topology.nix      (the shared cluster)
+  + cluster/          (the shared cluster)
   = <name>::<flavour>
 ```
 

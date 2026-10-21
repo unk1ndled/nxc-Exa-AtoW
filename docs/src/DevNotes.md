@@ -8,11 +8,11 @@ both paths; a combined composition selects its host application separately.
 
 ## Validation follows the repository layers
 
-`topology.nix` builds the shared infrastructure. `compositions.nix` lists
+`cluster/topology.nix` builds the shared infrastructure. `compositions.nix` lists
 every composition; each one enables apps on the frontend and on named compute
 nodes, and picks the app tests to run.
 
-`topology.nix` waits for ebuffer, ebservice, login, the SLURM controller, and
+`cluster/topology.nix` waits for ebuffer, ebservice, login, the SLURM controller, and
 every declared compute daemon before the app test runs. The combined
 composition stages both fixtures and submits both two-node batch jobs, which
 proves that both executables are present on the compute nodes. The heterogeneous
@@ -22,7 +22,7 @@ runs OpenQCD across the two nodes that advertise it.
 Workload execution and detailed validation stay in the maintained batch
 scripts, not in a long sequence of driver stages.
 
-The host path uses `e2e/common.py` for the shared API, RemoteManager, SLURM,
+The host path uses `clients/python-e2e/common.py` for the shared API, RemoteManager, SLURM,
 ebuffer transfer, timeout, diagnostics, and cleanup lifecycle. Application
 modules export small contracts:
 
@@ -32,7 +32,7 @@ modules export small contracts:
   checks the lattice, process grid, trajectory, configuration export, and
   plaquette.
 
-`minimal-e2e.py` is the catalog dispatcher used by `scripts/run-e2e.sh`; it
+`minimal-e2e.py` is the catalog dispatcher used by `clients/python-e2e/run-e2e.sh`; it
 does not implement another workload lifecycle. App-specific resource requests
 live in `mpi-hello-job.ini` and `openqcd-job.ini`, while
 `minimal-hpc.ini` remains the shared connection configuration.
@@ -47,15 +47,15 @@ It contains Bash, SSH, rsync, uv, and the basic tools needed by the test.
 Ideally RemoteManager would resolve Bash from `PATH`, accept an executable
 path, or avoid shell fallbacks. Failed commands can leave randomly named
 eight-hex-digit `.sh` files and `remotemanager.log` behind. The launcher runs
-from `e2e/` so those artifacts do not pollute the repository root.
+from `clients/python-e2e/` so those artifacts do not pollute the repository root.
 
 ## VM ports and workload switching
 
 NXC records VM IDs and roles in `deploy/openqcd::vm.json` or
-`deploy/mpi-hello::vm.json`, but allocated host SSH ports are recovered by
-inspecting QEMU command lines. `scripts/tunnel.sh` matches the VM ID encoded in
-the MAC address and extracts its `hostfwd` port. This works for the current NXC
-VM flavour but depends on its implementation details.
+`deploy/mpi-hello::vm.json`, and forwards each VM's SSH to host port
+`22021 + vm_id`. `scripts/tunnel.sh` computes the port from the VM ID. This
+works for the current NXC VM flavour but depends on its implementation
+details.
 
 All compositions expose services on the same loopback ports: ebuffer on
 8000, ebservice on 8001, and frontend SSH on 2222. Only one composition can be
@@ -76,7 +76,7 @@ through a local forwarded port with a chosen SSH key. Configuring
 `127.0.0.1` as the host also makes RemoteManager classify it as local
 execution and skip SSH.
 
-`TunnelRemoteExecutor` in `e2e/common.py` therefore uses the logical
+`TunnelRemoteExecutor` in `clients/python-e2e/common.py` therefore uses the logical
 `nxc-frontend` host while overriding SSH to connect to `127.0.0.1:2222` with
 the selected identity and noninteractive host-key options.
 

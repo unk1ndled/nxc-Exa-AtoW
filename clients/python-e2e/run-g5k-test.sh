@@ -4,7 +4,7 @@ set -euo pipefail
 workload="${1:-openqcd}"
 application="${2:-$workload}"
 deployment_file="${3:-deploy/${workload}::g5k-nfs-store.json}"
-repository_root=$(realpath "$(dirname "${BASH_SOURCE[0]}")/..")
+repository_root=$(realpath "$(dirname "${BASH_SOURCE[0]}")/../..")
 
 if [[ ! -f "$deployment_file" ]]; then
   echo "deployment file not found: $deployment_file" >&2
@@ -27,5 +27,5 @@ export E2E_EBSERVICE_URL="http://${ebservice_ip}:8001/api/v1"
 export E2E_SSH_HOST=$frontend_ip
 
 cd "$repository_root"
-uv run --project e2e \
-  bash scripts/run-e2e.sh "$application" g5k-direct "$deployment_file" "$workload"
+uv run --project clients/python-e2e \
+  bash clients/python-e2e/run-e2e.sh "$application" g5k-direct "$deployment_file" "$workload"

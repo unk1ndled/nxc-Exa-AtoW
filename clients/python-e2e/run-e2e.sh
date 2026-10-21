@@ -5,7 +5,7 @@ application="${1:-openqcd}"
 transport="${2:-vm-tunnel}"
 deployment_file="${3:-deploy/${application}::vm.json}"
 expected_composition="${4:-$application}"
-repository_root=$(realpath "$(dirname "${BASH_SOURCE[0]}")/..")
+repository_root=$(realpath "$(dirname "${BASH_SOURCE[0]}")/../..")
 
 if [[ ! -f "$deployment_file" ]]; then
   echo "deployment file not found: $deployment_file" >&2
@@ -42,5 +42,5 @@ if [[ -n ${E2E_HPC_CONFIG:-} ]]; then
   export E2E_HPC_CONFIG
 fi
 
-cd "$repository_root/e2e"
+cd "$repository_root/clients/python-e2e"
 python minimal-e2e.py --app "$application"

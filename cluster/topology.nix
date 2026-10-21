@@ -1,6 +1,6 @@
 # The shared cluster: ebuffer, ebservice, a SLURM frontend and controller,
 # and the compute nodes a composition declares. `frontend` and each compute
-# node are NixOS configuration that enables apps from ./apps.
+# node are NixOS configuration that enables apps from ../apps.
 {
   frontend,
   computeNodes,
@@ -57,7 +57,7 @@ let
     {
       imports = [
         clusterBase
-        ./apps
+        ../apps
         node
       ];
       services.slurm.client.enable = true;
@@ -93,12 +93,12 @@ else
           networking.firewall.enable = false;
           services.ebuffer = {
             enable = true;
-            configDir = ./config/ebuffer;
+            configDir = ./ebuffer;
             host = "0.0.0.0";
           };
           systemd.services.ebuffer.preStart = lib.mkForce ''
             echo "Copying ebuffer config without NFS ownership metadata"
-            cp -r --no-preserve=ownership ${./config/ebuffer}/* .
+            cp -r --no-preserve=ownership ${./ebuffer}/* .
             chmod -R u+w .
             mkdir -p ./data
             touch ./data/eb_database.db
@@ -116,12 +116,12 @@ else
           services.ebservice = {
             enable = true;
             ebserverhost = "ebuffer";
-            configDir = ./config/ebservice;
+            configDir = ./ebservice;
             host = "0.0.0.0";
           };
           systemd.services.ebservice.preStart = lib.mkForce ''
             echo "Copying ebservice config without NFS ownership metadata"
-            cp -r --no-preserve=ownership ${./config/ebservice}/* .
+            cp -r --no-preserve=ownership ${./ebservice}/* .
             chmod -R u+w .
             mkdir -p ./data
             touch ./data/eb_database.db
@@ -137,7 +137,7 @@ else
         {
           imports = [
             clusterBase
-            ./apps
+            ../apps
             frontend
           ];
           services.slurm.enableStools = true;

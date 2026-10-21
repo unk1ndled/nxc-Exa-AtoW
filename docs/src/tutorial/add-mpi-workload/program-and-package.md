@@ -165,7 +165,7 @@ mpi-calculator = topology {
 };
 ```
 
-Do not install the app from `topology.nix`. That file owns the shared
+Do not install the app from `cluster/topology.nix`. That file owns the shared
 topology and must remain app-neutral; compositions decide which apps are
 enabled where.
 

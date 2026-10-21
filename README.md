@@ -51,20 +51,20 @@ and one or more named compute nodes. Each composition enables apps per node,
 and compute nodes advertise their apps as SLURM features.
 
 To integrate another application, follow the step-by-step
-[mdBook tutorial](docs/tutorial/quickstart.md).
+[mdBook tutorial](docs/src/tutorial/quickstart.md).
 
 
 ## Repository layers
 
 | Layer | Location | Responsibility |
 | --- | --- | --- |
-| Shared infrastructure | `topology.nix` | Builds the ebuffer, ebservice, shared-storage, Munge, and SLURM topology, and waits for it to be ready before each test. |
+| Shared infrastructure | `cluster/topology.nix` | Builds the ebuffer, ebservice, shared-storage, Munge, and SLURM topology, and waits for it to be ready before each test. |
 | Apps | `apps/<name>/` | One NixOS module with an `exa-atow.apps.<name>.enable` option, its sources, a SLURM job, and an NXC test script per app. |
 | Compositions | `compositions.nix` | Every composition: which apps each node enables and which tests run. |
-| Optional API client | `e2e/` | Python client that drives a job through ebservice and ebuffer. Not needed to build, deploy, or run the NXC tests. |
+| Optional API client | `clients/python-e2e/` | Python client that drives a job through ebservice and ebuffer. Not needed to build, deploy, or run the NXC tests. |
 
 To add an application, create `apps/<name>/` following the
-[tutorial](docs/tutorial/quickstart.md).
+[tutorial](docs/src/tutorial/quickstart.md).
 
 ## End-to-end behavior
 
@@ -89,7 +89,7 @@ persistent storage, normal remote SCP, full scheduler accounting, large
 transfers, non-VM E2E behavior, portable CPU emulation, failure recovery, or
 concurrent multi-user behavior.
 
-See the [development notes](docs/DevNotes.md) for the local compatibility
+See the [development notes](docs/src/DevNotes.md) for the local compatibility
 adapters and testing shortcuts.
 
 
@@ -128,7 +128,7 @@ just test multi-software-composition openqcd
 NXC. `just test` expects that composition's VM deployment to be running,
 establishes its tunnels, and launches the selected application's host E2E. Its
 second argument defaults to the composition name for single-application
-compositions. Use `just install` once to create `e2e/.venv` from the locked
+compositions. Use `just install` once to create `clients/python-e2e/.venv` from the locked
 dependencies.
 
 Stop a VM deployment by interrupting its foreground `just up` process with
@@ -148,10 +148,10 @@ just docs
 just docs-serve
 ```
 
-The generated site is written to `book/`; the live server defaults to
+The generated site is written to `docs/book/`; the live server defaults to
 `http://127.0.0.1:3000`. Start at the
-[book introduction](docs/README.md) or browse its
-[table of contents](docs/SUMMARY.md).
+[book introduction](docs/src/README.md) or browse its
+[table of contents](docs/src/SUMMARY.md).
 
 Commits to the default branch publish the book on
 [GitHub Pages](https://unk1ndled.github.io/nxc-Exa-AtoW/).

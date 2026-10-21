@@ -25,7 +25,7 @@ jobs:
           mdbook-version: 0.4.52
 
       - name: Build book
-        run: mdbook build
+        run: mdbook build docs
 
       - name: Configure GitHub Pages
         if: github.event_name == 'push'
@@ -35,7 +35,7 @@ jobs:
         if: github.event_name == 'push'
         uses: actions/upload-pages-artifact@v3
         with:
-          path: book
+          path: docs/book
 
   deploy:
     if: github.event_name == 'push'

@@ -3,19 +3,19 @@ default:
 
 # Resolve the locally imported SDK packages and download their dependencies.
 install:
-    nix develop --command uv sync --project e2e
+    nix develop --command uv sync --project clients/python-e2e
 
 # Evaluate the flake and its outputs.
 check:
     nix flake check
 
-# Build the mdBook documentation into book/.
+# Build the mdBook documentation into docs/book/.
 docs:
-    nix develop --command mdbook build
+    nix develop --command mdbook build docs
 
 # Serve the mdBook documentation with live reload.
 docs-serve hostname="127.0.0.1" port="3000":
-    nix develop --command mdbook serve --hostname "{{ hostname }}" --port "{{ port }}"
+    nix develop --command mdbook serve docs --hostname "{{ hostname }}" --port "{{ port }}"
 
 # Build one composition. The flavour stays first for `just build docker` compatibility.
 build flavour="vm" workload="openqcd":
@@ -35,7 +35,7 @@ nxc-test workload="openqcd":
 # The optional application argument is useful when a composition contains several packages.
 test workload="openqcd" application=workload:
     just tunnel "{{ workload }}"
-    nix develop --command e2e-fhs -c "uv run --project e2e bash scripts/run-e2e.sh '{{ application }}' vm-tunnel 'deploy/{{ workload }}::vm.json' '{{ workload }}'"
+    nix develop --command e2e-fhs -c "uv run --project clients/python-e2e bash clients/python-e2e/run-e2e.sh '{{ application }}' vm-tunnel 'deploy/{{ workload }}::vm.json' '{{ workload }}'"
 
 # Build a physical Grid'5000 deployment from a site frontend.
 g5k-build workload="openqcd":
@@ -47,11 +47,11 @@ g5k-check workload="openqcd":
 
 # Run the host API-to-SLURM scenario directly from the Grid'5000 frontend.
 g5k-test workload="openqcd" application=workload:
-    nix develop --command bash scripts/run-g5k-test.sh "{{ workload }}" "{{ application }}" "deploy/{{ workload }}::g5k-nfs-store.json"
+    nix develop --command bash clients/python-e2e/run-g5k-test.sh "{{ workload }}" "{{ application }}" "deploy/{{ workload }}::g5k-nfs-store.json"
 
 # Build, reserve, deploy, validate, run the host E2E, and always release the job.
 g5k-e2e workload="openqcd" application=workload walltime="1:00:00" duration="1h":
-    bash scripts/g5k-e2e.sh "{{ workload }}" "{{ application }}" "{{ walltime }}" "{{ duration }}"
+    bash clients/python-e2e/g5k-e2e.sh "{{ workload }}" "{{ application }}" "{{ walltime }}" "{{ duration }}"
 
 # Forward APIs and frontend SSH from the selected VM composition.
 tunnel workload="openqcd":

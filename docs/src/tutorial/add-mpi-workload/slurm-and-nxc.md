@@ -137,7 +137,7 @@ mpi-calculator = topology {
 };
 ```
 
-`topology.nix` runs its service and SLURM readiness checks before this script.
+`cluster/topology.nix` runs its service and SLURM readiness checks before this script.
 
 Now evaluate and run the first complete test layer:
 

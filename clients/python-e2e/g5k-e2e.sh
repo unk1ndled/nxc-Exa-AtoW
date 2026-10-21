@@ -5,7 +5,7 @@ workload="${1:-openqcd}"
 application="${2:-$workload}"
 walltime="${3:-1:00:00}"
 duration="${4:-1h}"
-repository_root=$(realpath "$(dirname "${BASH_SOURCE[0]}")/..")
+repository_root=$(realpath "$(dirname "${BASH_SOURCE[0]}")/../..")
 flavour="g5k-nfs-store"
 composition="${workload}::${flavour}"
 
@@ -141,4 +141,4 @@ echo "Running embedded topology checks"
 run_in_nix_shell nxc driver -t -d "$deployment_file"
 
 echo "Running $application API-to-SLURM E2E"
-run_in_nix_shell bash scripts/run-g5k-test.sh "$workload" "$application" "$deployment_file"
+run_in_nix_shell bash clients/python-e2e/run-g5k-test.sh "$workload" "$application" "$deployment_file"

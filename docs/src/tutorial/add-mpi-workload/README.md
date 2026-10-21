@@ -72,9 +72,9 @@ compositions.nix            mpi-calculator = topology { ... };
         └─> mpi-calculator::vm
 
 Optional host client, only for the ebservice API path:
-  e2e/mpi_calculator_e2e.py
-  e2e/mpi-calculator-job.ini
-  e2e/minimal-e2e.py
+  clients/python-e2e/mpi_calculator_e2e.py
+  clients/python-e2e/mpi-calculator-job.ini
+  clients/python-e2e/minimal-e2e.py
 ```
 
 Nothing is discovered automatically. `apps/default.nix` lists every app

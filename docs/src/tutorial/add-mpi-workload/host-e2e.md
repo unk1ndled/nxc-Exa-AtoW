@@ -6,7 +6,7 @@ SSH tunnel, and validates the returned artifact.
 
 ## 5. Describe the API-to-SLURM job
 
-Create `e2e/mpi-calculator-job.ini`:
+Create `clients/python-e2e/mpi-calculator-job.ini`:
 
 ```ini
 [JOB]
@@ -36,13 +36,13 @@ program's two-rank requirement.
 
 The calculator has no uploaded input file. Its operands are fixed test data in
 the application contract. For a program that consumes a mesh, parameter file,
-or dataset, list those paths in `input_files`; `e2e/common.py` will create input
+or dataset, list those paths in `input_files`; `clients/python-e2e/common.py` will create input
 ebuffers and stage their bytes in the remote job directory. The OpenQCD
 contract is the working example of that pattern.
 
 ## 6. Write the application-specific host contract
 
-Create `e2e/mpi_calculator_e2e.py`:
+Create `clients/python-e2e/mpi_calculator_e2e.py`:
 
 ```python
 import re
@@ -150,7 +150,7 @@ downloads output, and cleans up.
 
 ## 7. Register the host contract
 
-The `just test` path ends in `e2e/minimal-e2e.py`. Import the calculator and
+The `just test` path ends in `clients/python-e2e/minimal-e2e.py`. Import the calculator and
 add it to `APPLICATIONS`:
 
 ```python
@@ -174,7 +174,7 @@ You can confirm dispatcher registration without starting VMs:
 
 ```console
 $ nix develop --command e2e-fhs -c \
-    "uv run --project e2e python e2e/minimal-e2e.py --help"
+    "uv run --project clients/python-e2e python clients/python-e2e/minimal-e2e.py --help"
 ```
 
 The choices should now include `mpi-calculator`.
