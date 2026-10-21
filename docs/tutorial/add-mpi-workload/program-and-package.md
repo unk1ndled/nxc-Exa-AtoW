@@ -96,8 +96,10 @@ processes on one node.
 Create `apps/mpi-calculator/default.nix`:
 
 ```nix
-{ pkgs, ... }:
+{ config, lib, pkgs, ... }:
 let
+  cfg = config.exa-atow.apps.mpi-calculator;
+
   mpiCalculator = pkgs.stdenv.mkDerivation {
     pname = "mpi-calculator";
     version = "1.0";
@@ -119,42 +121,66 @@ let
   };
 in
 {
-  imports = [ ../openmpi.nix ];
-  environment.systemPackages = [ mpiCalculator ];
+  options.exa-atow.apps.mpi-calculator.enable =
+    lib.mkEnableOption "the MPI calculator example";
+
+  config = lib.mkIf cfg.enable {
+    exa-atow.openmpi.enable = true;
+    environment.systemPackages = [ mpiCalculator ];
+  };
 }
 ```
 
 There are two distinct uses of OpenMPI here. `nativeBuildInputs` makes `mpicc`
-available while Nix builds the C program. Importing `apps/openmpi.nix` installs the
-MPI runtime in the machines and applies the TCP transport settings used by
-this VM topology.
+available while Nix builds the C program. Setting `exa-atow.openmpi.enable`
+turns on `apps/openmpi.nix`, which installs the MPI runtime in the machines
+and applies the TCP transport settings used by this VM topology.
 
-Do not import this module from `topology.nix`. That file owns the shared
-topology and must remain app-neutral; `compositions.nix` injects the module
-into the frontend and compute roles.
+Every machine imports every app module, so the option exists everywhere, but
+the module does nothing until a composition sets
+`exa-atow.apps.mpi-calculator.enable = true`.
+
+Add the directory to `apps/default.nix`:
+
+```nix
+imports = [
+  ./openmpi.nix
+  ./mpi-calculator
+  ./mpi-hello
+  ./openqcd
+];
+```
+
+Then add a composition to `compositions.nix` that enables the app on the
+frontend and both compute nodes:
+
+```nix
+mpi-calculator = topology {
+  frontend.exa-atow.apps.mpi-calculator.enable = true;
+  computeNodes = {
+    compute1.exa-atow.apps.mpi-calculator.enable = true;
+    compute2.exa-atow.apps.mpi-calculator.enable = true;
+  };
+  testScript = "";
+};
+```
+
+Do not install the app from `topology.nix`. That file owns the shared
+topology and must remain app-neutral; compositions decide which apps are
+enabled where.
 
 To install several apps together, or different apps on different compute
-nodes, add a file under `compositions/` instead.
-`compositions/heterogeneous-cluster.nix` is the per-node example. Compute
-names must match `compute[1-9][0-9]*`; the optional features become SLURM
-constraints:
+nodes, enable them per node. `heterogeneous-cluster` in `compositions.nix` is
+the per-node example. Compute names must match `compute[1-9][0-9]*`, and each
+compute node advertises the apps it enables as SLURM features:
 
 ```nix
 computeNodes = {
-  compute1 = {
-    modules = [
-      mpi-hello.module
-      openqcd.module
-    ];
-    features = [
-      "mpi-hello"
-      "openqcd"
-    ];
+  compute1.exa-atow.apps = {
+    mpi-hello.enable = true;
+    openqcd.enable = true;
   };
-  compute2 = {
-    modules = [ openqcd.module ];
-    features = [ "openqcd" ];
-  };
+  compute2.exa-atow.apps.openqcd.enable = true;
 };
 ```
 
@@ -162,7 +188,7 @@ Users can target compatible nodes with `srun --constraint=openqcd ...` or an
 exact role with `srun --nodelist=compute1 ...`. Multi-node jobs require enough
 nodes that share the selected feature.
 
-`just check` fails until `apps/mpi-calculator/test.nix` exists. The next
-chapter adds it.
+`just check` now passes, and the composition runs only the shared readiness
+checks. The next chapter gives it a real test.
 
 Continue with [Test it through SLURM and NXC](slurm-and-nxc.md).

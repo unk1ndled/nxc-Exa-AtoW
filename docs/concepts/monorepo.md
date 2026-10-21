@@ -19,20 +19,17 @@ Today, `mpi-hello` and `openqcd` can run separately, together in
 ├── nxc.json                  Points NXC to the composition catalog
 │
 ├── topology.nix              The shared cluster: services, SLURM, readiness checks
-├── compositions.nix          Turns apps/ and compositions/ into NXC compositions
+├── compositions.nix          Every composition: which apps each node enables
 │
-├── apps/                     One directory per app; each becomes a composition
+├── apps/                     One directory per app
+│   ├── default.nix           Imports every app module
 │   ├── openmpi.nix           MPI setup shared by the apps
 │   ├── mpi-hello/
-│   │   ├── default.nix       NixOS module: package and environment
+│   │   ├── default.nix       NixOS module: enable option, package, test fixture
 │   │   ├── mpi-hello.c       Source
 │   │   ├── mpi-hello.sbatch  SLURM job, usable directly with sbatch
-│   │   └── test.nix          NXC test: job fixture and assertions
+│   │   └── test.nix          NXC test script
 │   └── openqcd/              Same shape, plus the openqcd-ym1.in input
-│
-├── compositions/             Compositions that combine several apps
-│   ├── multi-software-composition.nix  Both apps on every node
-│   └── heterogeneous-cluster.nix       Different apps per compute node
 │
 ├── config/                   Runtime configuration for the API services
 │   ├── ebuffer/              Data-buffer service configuration
@@ -43,11 +40,15 @@ Today, `mpi-hello` and `openqcd` can run separately, together in
 └── justfile                  Commands used to build, run, and test
 ```
 
-Compositions are assembled without a hand-maintained catalog:
+Every machine imports every app module; each app is off until a composition
+enables it:
 
 ```text
-apps/<name>/default.nix + apps/<name>/test.nix + topology.nix = <name>::<flavour>
-compositions/<name>.nix                        + topology.nix = <name>::<flavour>
+apps/<name>/  (module with exa-atow.apps.<name>.enable)
+  + compositions.nix  (which nodes enable which apps, which test runs)
+  + topology.nix      (the shared cluster)
+  = <name>::<flavour>
 ```
 
-Adding a directory under `apps/` is enough to get a new composition.
+Compute nodes advertise the apps they enable as SLURM features, so a
+composition never lists features separately.

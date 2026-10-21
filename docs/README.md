@@ -17,9 +17,9 @@ The repository ships four compositions:
 - `heterogeneous-cluster`  OpenQCD on both compute nodes, with MPI Hello and its SLURM feature only on `compute1`.
 
 All compositions reuse the same ebuffer, ebservice, shared storage, SLURM,
-SSH, test lifecycle, and deployment machinery. A composition can select
-uniform application modules or assign modules and scheduler features to each
-named compute node.
+SSH, test lifecycle, and deployment machinery. A composition enables apps on
+the frontend and on each named compute node; compute nodes advertise their
+apps as SLURM features.
 
 > This is a local development demonstrator, not a production HPC service. Its
 > tiny VM resources, bootstrap credentials, in-memory data, disabled

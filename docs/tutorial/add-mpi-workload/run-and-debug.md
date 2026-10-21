@@ -54,10 +54,11 @@ once.
 
 | Symptom | Likely cause and first place to look |
 | --- | --- |
-| Flake evaluation reports a missing `test.nix` | Every directory under `apps/` needs both `default.nix` and `test.nix`. |
-| `command -v mpi-calculator` fails | The package is not in `environment.systemPackages` in `apps/mpi-calculator/default.nix`. |
+| Flake evaluation reports that `exa-atow.apps.mpi-calculator` does not exist | `apps/default.nix` does not import `./mpi-calculator`. |
+| `command -v mpi-calculator` fails | The node does not set `exa-atow.apps.mpi-calculator.enable = true` in `compositions.nix`, or the package is not in `environment.systemPackages` in `apps/mpi-calculator/default.nix`. |
+| `setup-mpi-calculator-test.service` does not exist | The frontend does not set `exa-atow.apps.mpi-calculator.testFixtures = true`. |
 | The SLURM job stays pending | The request exceeds the VM resources, or a compute daemon is not ready. Inspect `squeue`, `scontrol show job <id>`, and `sinfo` on the frontend. |
-| `srun` reports an MPI or PMIx error | Confirm `--mpi=pmix`, the `../openmpi.nix` import, and the default `QEMU_OPTS=-cpu host` path. |
+| `srun` reports an MPI or PMIx error | Confirm `--mpi=pmix`, `exa-atow.openmpi.enable = true` in the app module, and the default `QEMU_OPTS=-cpu host` path. |
 | SLURM completes but the host E2E cannot return output | `output_name`, the path written by `scheduler_core`, and `diagnostic_files` must use the same filename. |
 | The host validator sees only one host | Check `nodes = 2`, `tasks = 2`, and `--ntasks-per-node=1` in every resource declaration. |
 | The host E2E cannot connect or tests the wrong binary | Only one deployment can own ports 8000, 8001, and 2222. Keep a matching `just up vm mpi-calculator` running and rerun `just test mpi-calculator`. |
@@ -74,9 +75,11 @@ Before committing, the new app should have these files:
 | Concern | File |
 | --- | --- |
 | Source | `apps/mpi-calculator/mpi-calculator.c` |
-| Nix package and runtime | `apps/mpi-calculator/default.nix` |
+| Nix package, runtime, and test fixture | `apps/mpi-calculator/default.nix` |
 | Direct scheduler job | `apps/mpi-calculator/mpi-calculator.sbatch` |
-| NXC fixture and assertions | `apps/mpi-calculator/test.nix` |
+| NXC assertions | `apps/mpi-calculator/test.nix` |
+| Module import | `apps/default.nix` |
+| Composition | `mpi-calculator` in `compositions.nix` |
 
 If you also use the optional host client:
 

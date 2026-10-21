@@ -13,20 +13,23 @@ NixOS role that enables each service remains in `topology.nix`.
 
 ## You are adding a scientific workload
 
-Create `apps/<name>/` with a NixOS module in `default.nix` that installs the
-package, and an NXC test in `test.nix`. The directory name becomes the
-composition name; no catalog needs updating. Modules should not redefine the
-shared topology.
+Create `apps/<name>/` with a NixOS module in `default.nix` and an NXC test
+script in `test.nix`. The module declares `exa-atow.apps.<name>.enable`, which
+installs the package, and `exa-atow.apps.<name>.testFixtures`, which stages
+the test job. Import the directory from `apps/default.nix`, then add a
+composition to `compositions.nix` that enables the app. Modules should not
+redefine the shared topology.
 
-To combine apps, or to install different apps on different compute nodes, add
-a file under `compositions/`. It returns `frontendModules`, `computeNodes`
-(each with `modules` and optional SLURM `features`), `testModules`, and
-`testScript`; see `compositions/heterogeneous-cluster.nix`.
+To combine apps, or to install different apps on different compute nodes,
+enable different apps per node in `compositions.nix`; see
+`heterogeneous-cluster`. Each compute node advertises the apps it enables as
+SLURM features.
 
 ## You are validating the architecture
 
 Readiness checks that every composition must pass live in `topology.nix`. Put
-app fixtures and assertions in `apps/<name>/test.nix`. The Python client under
+app fixtures in the app module behind `testFixtures`, and assertions in
+`apps/<name>/test.nix`. The Python client under
 `e2e/` is optional; use it only to exercise the ebservice API path.
 
 ## You are deploying or running it

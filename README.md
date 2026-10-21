@@ -47,8 +47,8 @@ topology:
   OpenQCD on both compute nodes.
 
 Every composition deploys ebuffer, ebservice, a SLURM frontend and controller,
-and one or more named compute nodes. Catalog entries can apply the same modules
-to every node or select modules and SLURM features per compute node.
+and one or more named compute nodes. Each composition enables apps per node,
+and compute nodes advertise their apps as SLURM features.
 
 To integrate another application, follow the step-by-step
 [mdBook tutorial](docs/tutorial/quickstart.md).
@@ -58,9 +58,9 @@ To integrate another application, follow the step-by-step
 
 | Layer | Location | Responsibility |
 | --- | --- | --- |
-| Shared infrastructure | `topology.nix` | Builds the ebuffer, ebservice, shared-storage, Munge, and SLURM topology from injected modules, and waits for it to be ready before each test. |
-| Apps | `apps/<name>/` | One NixOS module, its sources, a SLURM job, and an NXC test per app. Each directory becomes a composition. |
-| Combined compositions | `compositions/` | Compositions that install several apps, uniformly or per compute node. |
+| Shared infrastructure | `topology.nix` | Builds the ebuffer, ebservice, shared-storage, Munge, and SLURM topology, and waits for it to be ready before each test. |
+| Apps | `apps/<name>/` | One NixOS module with an `exa-atow.apps.<name>.enable` option, its sources, a SLURM job, and an NXC test script per app. |
+| Compositions | `compositions.nix` | Every composition: which apps each node enables and which tests run. |
 | Optional API client | `e2e/` | Python client that drives a job through ebservice and ebuffer. Not needed to build, deploy, or run the NXC tests. |
 
 To add an application, create `apps/<name>/` following the

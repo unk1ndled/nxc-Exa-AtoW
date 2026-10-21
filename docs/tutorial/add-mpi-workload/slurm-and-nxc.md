@@ -50,14 +50,49 @@ a meaningful result on shared storage?
 Create `apps/mpi-calculator/test.nix`:
 
 ```nix
-let
-  job = ./mpi-calculator.sbatch;
+# Runs on the frontend once the cluster is ready. Needs
+# `exa-atow.apps.mpi-calculator.testFixtures = true` on the frontend.
+rec {
   testDir = "/users/user1/mpi-calculator-e2e";
+
+  testScript = ''
+    frontend.succeed("systemctl start setup-mpi-calculator-test.service")
+    frontend.succeed("command -v mpi-calculator")
+    frontend.succeed("su - user1 -c 'cd ${testDir} && sbatch --wait mpi-calculator.sbatch'")
+    frontend.succeed("grep -q '^result add = 42$' ${testDir}/mpi-calculator.out")
+  '';
+}
+```
+
+Each `succeed` is one step, so a failure names the step that broke. The test
+checks that `mpi-calculator` is on `PATH`, then submits as `user1`; running as
+root would hide ownership and login-environment mistakes.
+
+The job has to be on shared storage before the test submits it. That fixture
+belongs to the app module, behind a second option, so only the frontend of a
+test composition stages it. In `apps/mpi-calculator/default.nix`, read
+`testDir` from the test file and replace the `options` and `config` blocks:
+
+```nix
+let
+  cfg = config.exa-atow.apps.mpi-calculator;
+  inherit (import ./test.nix) testDir;
+
+  mpiCalculator = ...; # unchanged
 in
 {
-  frontendModule =
-    { ... }:
-    {
+  options.exa-atow.apps.mpi-calculator = {
+    enable = lib.mkEnableOption "the MPI calculator example";
+    testFixtures = lib.mkEnableOption "staging the test job in user1's NFS home";
+  };
+
+  config = lib.mkMerge [
+    (lib.mkIf cfg.enable {
+      exa-atow.openmpi.enable = true;
+      environment.systemPackages = [ mpiCalculator ];
+    })
+
+    (lib.mkIf cfg.testFixtures {
       systemd.services.setup-mpi-calculator-test = {
         description = "Populate the MPI calculator integration-test directory";
         wantedBy = [ "multi-user.target" ];
@@ -70,36 +105,39 @@ in
         script = ''
           rm -rf "${testDir}"
           mkdir -p "${testDir}"
-          cp "${job}" "${testDir}/mpi-calculator.sbatch"
+          cp "${./mpi-calculator.sbatch}" "${testDir}/mpi-calculator.sbatch"
           chmod 0755 "${testDir}/mpi-calculator.sbatch"
           chown -R user1:users "${testDir}"
         '';
       };
-    };
-
-  testScript = ''
-    frontend.succeed(
-      "set -eu; "
-      "systemctl start setup-mpi-calculator-test.service; "
-      "command -v mpi-calculator >/dev/null; "
-      "su - user1 -c 'cd ${testDir} && sbatch --wait mpi-calculator.sbatch'; "
-      "test -s ${testDir}/mpi-calculator.out; "
-      "grep -q '^result add = 42$' ${testDir}/mpi-calculator.out"
-    )
-  '';
+    })
+  ];
 }
 ```
 
-The `frontendModule` creates a one-shot fixture service. Its
-`RequiresMountsFor` declaration matters: `/users` is shared by the controller,
-frontend, and compute nodes, and the fixture must not run before that mount is
-ready.
+The fixture is a one-shot service. Its `RequiresMountsFor` declaration
+matters: `/users` is shared by the controller, frontend, and compute nodes,
+and the fixture must not run before that mount is ready.
 
-The test checks that `mpi-calculator` is on `PATH`, then submits as `user1`;
-running as root would hide ownership and login-environment mistakes.
+Finally, turn on the fixture and the test in the `mpi-calculator` composition.
+Add `mpiCalculatorTest = import ./apps/mpi-calculator/test.nix;` to the `let`
+block at the top of `compositions.nix`, then:
 
-There is nothing to register. `topology.nix` runs its service and SLURM
-readiness checks before this script.
+```nix
+mpi-calculator = topology {
+  frontend.exa-atow.apps.mpi-calculator = {
+    enable = true;
+    testFixtures = true;
+  };
+  computeNodes = {
+    compute1.exa-atow.apps.mpi-calculator.enable = true;
+    compute2.exa-atow.apps.mpi-calculator.enable = true;
+  };
+  testScript = mpiCalculatorTest.testScript;
+};
+```
+
+`topology.nix` runs its service and SLURM readiness checks before this script.
 
 Now evaluate and run the first complete test layer:
 

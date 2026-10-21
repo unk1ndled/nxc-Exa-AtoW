@@ -8,9 +8,9 @@ both paths; a combined composition selects its host application separately.
 
 ## Validation follows the repository layers
 
-`topology.nix` builds the shared infrastructure. `compositions.nix` turns
-every directory under `apps/` into a composition with that app on all nodes,
-and every file under `compositions/` into a combined or per-node composition.
+`topology.nix` builds the shared infrastructure. `compositions.nix` lists
+every composition; each one enables apps on the frontend and on named compute
+nodes, and picks the app tests to run.
 
 `topology.nix` waits for ebuffer, ebservice, login, the SLURM controller, and
 every declared compute daemon before the app test runs. The combined
