@@ -1,7 +1,9 @@
 # Command reference
 
 Run `just` with no arguments to list the available recipes. Defaults are
-`openqcd` for the workload and `vm` for the flavour.
+`openqcd` for the composition and `vm` for the flavour. Every recipe runs its
+command inside `nix develop`, so the justfile reads as plain `nix`, `nxc`, and
+`mdbook` calls.
 
 ## Documentation and evaluation
 
@@ -10,7 +12,6 @@ Run `just` with no arguments to list the available recipes. Defaults are
 | `just check` | Evaluate the flake and validate its outputs with `nix flake check`. |
 | `just docs` | Build this mdBook into `docs/book/`. |
 | `just docs-serve` | Serve the book on `127.0.0.1:3000` with live reload. |
-| `just docs-serve 0.0.0.0 4000` | Override the documentation host and port. Exposing beyond loopback is your responsibility. |
 
 ## Dependency setup
 
@@ -21,13 +22,13 @@ Run `just` with no arguments to list the available recipes. Defaults are
 
 ## Build and deployment
 
-For these recipes the optional argument order is **flavour first, workload
+For these recipes the optional argument order is **flavour first, composition
 second**:
 
 ```text
-just build [flavour] [workload]
-just up    [flavour] [workload]
-just down  [flavour] [workload]
+just build [flavour] [composition]
+just up    [flavour] [composition]
+just down  [flavour] [composition]
 ```
 
 | Command | Selected composition |

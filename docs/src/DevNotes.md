@@ -143,5 +143,5 @@ portability.
 ## Standalone VM stop is missing upstream
 
 NXC's `stop` command calls `cleanup()` on the selected flavour, and the VM
-flavour's `cleanup()` does nothing, so `just down vm [workload]` leaves the VMs
+flavour's `cleanup()` does nothing, so `just down vm [composition]` leaves the VMs
 running. Stop VM deployments with Ctrl-C in the terminal running `just up`.

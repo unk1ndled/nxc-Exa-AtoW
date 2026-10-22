@@ -18,7 +18,7 @@ Use the root `justfile` as the command entry point:
 
 - `just install` creates/synchronizes `clients/python-e2e/.venv` from `clients/python-e2e/uv.lock`.
 - `just check` evaluates the flake and its outputs.
-- `just build vm mpi-hello` builds a selected composition; defaults are `vm` and `openqcd` (the argument is currently named `workload`).
+- `just build vm mpi-hello` builds a selected composition; defaults are `vm` and `openqcd`.
 - `just up vm openqcd` starts the topology in the foreground.
 - `just nxc-test [composition]` runs the composition's test inside NXC.
 - `just test [composition] [application]` runs one host E2E against an already running VM deployment.

@@ -1,9 +1,10 @@
+# Every recipe line runs inside the flake's development shell.
+set shell := ["nix", "develop", "--command", "bash", "-euc"]
+
+export QEMU_OPTS := env("QEMU_OPTS", "-cpu host")
+
 default:
     @just --list
-
-# Resolve the locally imported SDK packages and download their dependencies.
-install:
-    nix develop --command uv sync --project clients/python-e2e
 
 # Evaluate the flake and its outputs.
 check:
@@ -11,52 +12,42 @@ check:
 
 # Build the mdBook documentation into docs/book/.
 docs:
-    nix develop --command mdbook build docs
+    mdbook build docs
 
-# Serve the mdBook documentation with live reload.
-docs-serve hostname="127.0.0.1" port="3000":
-    nix develop --command mdbook serve docs --hostname "{{ hostname }}" --port "{{ port }}"
+# Serve the documentation on 127.0.0.1:3000 with live reload.
+docs-serve:
+    mdbook serve docs
 
-# Build one composition. The flavour stays first for `just build docker` compatibility.
-build flavour="vm" workload="openqcd":
-    nix develop --command nxc build -f "{{ flavour }}" -C "{{ workload }}::{{ flavour }}"
+# Build one composition, e.g. `just build vm mpi-hello`.
+build flavour="vm" composition="openqcd":
+    nxc build -f {{ flavour }} -C {{ composition }}::{{ flavour }}
 
-# Build and start the shared topology with one selected composition.
-up flavour="vm" workload="openqcd":
-    just build "{{ flavour }}" "{{ workload }}"
-    QEMU_OPTS="${QEMU_OPTS:--cpu host}" nix develop --command nxc start -C "{{ workload }}::{{ flavour }}"
+# Build and start the topology in the foreground.
+up flavour="vm" composition="openqcd": (build flavour composition)
+    nxc start -C {{ composition }}::{{ flavour }}
 
-# Run the selected composition's NXC integration test inside the topology.
-nxc-test workload="openqcd":
-    just build vm "{{ workload }}"
-    QEMU_OPTS="${QEMU_OPTS:--cpu host}" nix develop --command nxc start -t -C "{{ workload }}::vm"
+# Stop a deployment (the VM flavour has no cleanup; use Ctrl-C on `just up`).
+down flavour="vm" composition="openqcd":
+    nxc stop -d deploy/{{ composition }}::{{ flavour }}.json
 
-# Run one application's API-to-SLURM host E2E against the selected VM composition.
-# The optional application argument is useful when a composition contains several packages.
-test workload="openqcd" application=workload:
-    just tunnel "{{ workload }}"
-    nix develop --command e2e-fhs -c "uv run --project clients/python-e2e bash clients/python-e2e/run-e2e.sh '{{ application }}' vm-tunnel 'deploy/{{ workload }}::vm.json' '{{ workload }}'"
+# Build and run the composition's NXC test in temporary VMs.
+nxc-test composition="openqcd": (build "vm" composition)
+    nxc start -t -C {{ composition }}::vm
 
-# Build a physical Grid'5000 deployment from a site frontend.
-g5k-build workload="openqcd":
-    nix develop --command nxc build -f g5k-nfs-store -C "{{ workload }}::g5k-nfs-store"
+# Forward the APIs and frontend SSH of a running VM deployment.
+tunnel composition="openqcd":
+    bash scripts/tunnel.sh deploy/{{ composition }}::vm.json
 
-# Run embedded topology checks after the non-interactive kexec deployment.
-g5k-check workload="openqcd":
-    nix develop --command nxc driver -t -d "deploy/{{ workload }}::g5k-nfs-store.json"
+# Optional Python client: sync its locked environment.
+install:
+    uv sync --project clients/python-e2e
 
-# Run the host API-to-SLURM scenario directly from the Grid'5000 frontend.
-g5k-test workload="openqcd" application=workload:
-    nix develop --command bash clients/python-e2e/run-g5k-test.sh "{{ workload }}" "{{ application }}" "deploy/{{ workload }}::g5k-nfs-store.json"
+# Optional Python client: run one application's host E2E against `just up`.
+test composition="openqcd" application=composition: (tunnel composition)
+    e2e-fhs -c "uv run --project clients/python-e2e bash clients/python-e2e/run-e2e.sh {{ application }} vm-tunnel deploy/{{ composition }}::vm.json {{ composition }}"
 
-# Build, reserve, deploy, validate, run the host E2E, and always release the job.
-g5k-e2e workload="openqcd" application=workload walltime="1:00:00" duration="1h":
-    bash clients/python-e2e/g5k-e2e.sh "{{ workload }}" "{{ application }}" "{{ walltime }}" "{{ duration }}"
-
-# Forward APIs and frontend SSH from the selected VM composition.
-tunnel workload="openqcd":
-    nix develop --command bash scripts/tunnel.sh "deploy/{{ workload }}::vm.json"
-
-# Stop through NXC when the selected flavour implements standalone cleanup.
-down flavour="vm" workload="openqcd":
-    nix develop --command nxc stop -d "deploy/{{ workload }}::{{ flavour }}.json"
+# Optional Python client: reserve, deploy, and test on Grid'5000, then release the job.
+# Runs outside the dev shell: the script finds a user-installed Nix on the frontend itself.
+[script("bash")]
+g5k-e2e composition="openqcd" application=composition walltime="1:00:00" duration="1h":
+    bash clients/python-e2e/g5k-e2e.sh {{ composition }} {{ application }} {{ walltime }} {{ duration }}
