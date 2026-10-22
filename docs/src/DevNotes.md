@@ -9,15 +9,12 @@ both paths; a combined composition selects its host application separately.
 ## Validation follows the repository layers
 
 `cluster/topology.nix` builds the shared infrastructure. `compositions.nix` lists
-every composition; each one enables apps on the frontend and on named compute
-nodes, and picks the app tests to run.
+every composition; each one enables apps on the frontend and on groups of
+compute nodes with a `count`, and picks the app tests to run.
 
 `cluster/topology.nix` waits for ebuffer, ebservice, login, the SLURM controller, and
-every declared compute daemon before the app test runs. The combined
-composition stages both fixtures and submits both two-node batch jobs, which
-proves that both executables are present on the compute nodes. The heterogeneous
-composition verifies node-local package isolation and SLURM features, then
-runs OpenQCD across the two nodes that advertise it.
+every declared compute daemon before the app test runs. The `openqcd`
+composition then stages its fixture and submits the two-node `ym1` job.
 
 Workload execution and detailed validation stay in the maintained batch
 scripts, not in a long sequence of driver stages.
@@ -51,8 +48,8 @@ from `clients/python-e2e/` so those artifacts do not pollute the repository root
 
 ## VM ports and workload switching
 
-NXC records VM IDs and roles in `deploy/openqcd::vm.json` or
-`deploy/mpi-hello::vm.json`, and forwards each VM's SSH to host port
+NXC records VM IDs and roles in `deploy/<composition>::vm.json`, such as
+`deploy/openqcd::vm.json`, and forwards each VM's SSH to host port
 `22021 + vm_id`. `scripts/tunnel.sh` computes the port from the VM ID. This
 works for the current NXC VM flavour but depends on its implementation
 details.

@@ -35,17 +35,15 @@ just down  [flavour] [composition]
 | --- | --- |
 | `just build` | `openqcd::vm` |
 | `just build docker` | `openqcd::docker` |
-| `just build vm mpi-hello` | `mpi-hello::vm` |
-| `just build vm heterogeneous-cluster` | Per-node software composition using the VM flavour. |
+| `just build vm my-cluster` | `my-cluster::vm`, for a composition you added to `compositions.nix`. |
 | `just up` | Build and start `openqcd::vm` in the foreground. |
-| `just up vm mpi-hello` | Build and start `mpi-hello::vm` in the foreground. |
-| `just down docker mpi-hello` | Ask NXC to stop the recorded Docker deployment. |
+| `just down docker` | Ask NXC to stop the recorded Docker deployment. |
 
 `just up` and the VM test recipe default `QEMU_OPTS` to `-cpu host` only when
 the variable is unset. To add other QEMU options, include the CPU choice:
 
 ```console
-$ QEMU_OPTS="-cpu host <other-options>" just up vm mpi-hello
+$ QEMU_OPTS="-cpu host <other-options>" just up
 ```
 
 Stop VM deployments with Ctrl-C in the foreground `just up` terminal.
@@ -60,15 +58,9 @@ by an optional application; the application defaults to the composition name.
 | Command | Effect |
 | --- | --- |
 | `just nxc-test` | Build and run the OpenQCD test inside a temporary VM topology. |
-| `just nxc-test mpi-hello` | Run the MPI hello in-topology test. |
-| `just nxc-test multi-software-composition` | Run both application jobs in one topology. |
-| `just nxc-test heterogeneous-cluster` | Validate node-local packages, SLURM features, and the two-node OpenQCD job. |
 | `just tunnel` | Forward a live `openqcd::vm` deployment. |
-| `just tunnel mpi-hello` | Forward a live `mpi-hello::vm` deployment. |
 | `just test` | Tunnel to a live OpenQCD VM deployment and run its host E2E. |
-| `just test mpi-hello` | Tunnel to a live MPI hello VM deployment and run its host E2E. |
-| `just test multi-software-composition mpi-hello` | Run the MPI Hello host contract against the combined deployment. |
-| `just test multi-software-composition openqcd` | Run the OpenQCD host contract against the combined deployment. |
+| `just test my-cluster mpi-hello` | Run the MPI Hello host contract against a running `my-cluster::vm` that enables it. |
 
 `just nxc-test` starts its own topology. `just test` expects a matching
 `just up` process already running.

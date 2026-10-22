@@ -2,9 +2,10 @@
 # Where to work
 ## You are defining the architecture
 
-Start with `cluster/topology.nix`. Change it when the machine roles, node count,
+Start with `cluster/topology.nix`. Change it when the machine roles,
 networking, shared storage, or SLURM layout changes. Change `flake.nix` only
-when the architecture needs a new pinned dependency or NixOS module.
+when the architecture needs a new pinned dependency or NixOS module. Node counts
+and the apps on each node belong to the compositions in `compositions.nix`.
 
 ## You are configuring a service
 
@@ -21,8 +22,8 @@ composition to `compositions.nix` that enables the app. Modules should not
 redefine the shared topology.
 
 To combine apps, or to install different apps on different compute nodes,
-enable different apps per node in `compositions.nix`; see
-`heterogeneous-cluster`. Each compute node advertises the apps it enables as
+declare one compute group per node type in `compositions.nix`; see the
+[quick start](quickstart.md#3-declare-your-own-cluster). Each compute node advertises the apps it enables as
 SLURM features.
 
 ## You are validating the architecture

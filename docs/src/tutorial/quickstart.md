@@ -1,7 +1,8 @@
 # Quick start
 
-Start with `mpi-hello`. It is fast, has no input file, and proves the same
-two-node scheduler/MPI path used by OpenQCD.
+The repository ships one composition, `openqcd`: ebuffer, ebservice, a SLURM
+frontend and controller, and the two compute nodes the OpenQCD `ym1` job needs.
+It is the default for every recipe.
 
 ## 0. Install the requirements
 
@@ -79,30 +80,29 @@ instead of using `just up`:
 
 ```console
 # terminal 1
-$ just build vm mpi-hello
+$ just build
 $ QEMU_OPTS="-cpu host" nix develop --command nxc start \
     --identity-file "$HOME/.ssh/id_ed25519.pub" \
-    -C "mpi-hello::vm"
+    -C "openqcd::vm"
 
 # terminal 2
-$ NXC_IDENTITY_FILE="$HOME/.ssh/id_ed25519" just test mpi-hello
+$ NXC_IDENTITY_FILE="$HOME/.ssh/id_ed25519" just test
 ```
 
 ## 1. Run the self-contained topology test
 
 ```console
-$ just nxc-test mpi-hello
+$ just nxc-test
 ```
 
 This command:
 
-1. builds `mpi-hello::vm`;
+1. builds `openqcd::vm`;
 2. boots a temporary six-node topology;
 3. waits for both APIs, the SLURM controller, and both compute daemons;
-4. stages the example under shared `/users`;
-5. verifies `mpi-hello` is installed and `ym1` is absent;
-6. submits the two-node job; and
-7. checks that its output is non-empty.
+4. stages the OpenQCD input under shared `/users`;
+5. submits the two-node `ym1` job; and
+6. checks that its log and configuration output are non-empty.
 
 It does not require `just up` in another terminal.
 
@@ -114,80 +114,66 @@ First install the host E2E dependencies if you have not already:
 $ just install
 ```
 
-In terminal 1, build and start the matching VM deployment:
+In terminal 1, build and start the VM deployment:
 
 ```console
-$ just up vm mpi-hello
+$ just up
 ```
 
 Keep that foreground process running. In terminal 2:
 
 ```console
-$ just test mpi-hello
-```
-
-`just test` establishes the three tunnels automatically. A successful run
-prints changing pipeline states, an E2E success line, the SLURM job ID,
-scheduler and output ebuffer IDs, and the returned rank lines. The host
-validator requires ranks 0 and 1 to name two different compute hosts.
-
-Return to terminal 1 and press Ctrl-C to stop the VM deployment.
-
-> `just down vm mpi-hello` does not stop VMs: NXC's VM flavour has no
-> standalone cleanup. Ctrl-C on the foreground `just up` process is the
-> supported local stop path.
-
-## 3. Try the scientific workload
-
-Repeat the same two validation layers for OpenQCD:
-
-```console
-$ just nxc-test openqcd
-```
-
-Then, in terminal 1:
-
-```console
-$ just up vm openqcd
-```
-
-And in terminal 2:
-
-```console
-$ just test openqcd
-```
-
-The OpenQCD contract uploads `openqcd-ym1.in`, launches exactly two MPI ranks,
-downloads `openqcd-e2e.log`, and validates its lattice, process grid, single
-trajectory, configuration export, and plaquette.
-
-Because `openqcd` and `vm` are the defaults, the last workflow can also be
-written:
-
-```console
-$ just nxc-test
-$ just up
-# in another terminal
 $ just test
 ```
 
-## 4. Run both applications in one composition
+`just test` establishes the three tunnels automatically. The OpenQCD contract
+uploads `openqcd-ym1.in`, launches exactly two MPI ranks, downloads
+`openqcd-e2e.log`, and validates its lattice, process grid, single trajectory,
+configuration export, and plaquette.
 
-The combined composition installs both software modules on the frontend and
-compute nodes. Its NXC test submits both jobs:
+Return to terminal 1 and press Ctrl-C to stop the VM deployment.
 
-```console
-$ just nxc-test multi-software-composition
+> `just down` does not stop VMs: NXC's VM flavour has no standalone cleanup.
+> Ctrl-C on the foreground `just up` process is the supported local stop path.
+
+## 3. Declare your own cluster
+
+A composition is an entry in `compositions.nix`. Compute nodes come in groups
+of identical nodes: a group `compute` with `count = 4` becomes `compute1` to
+`compute4`, and its `node` enables the apps every node in it runs. For example,
+four OpenQCD nodes plus one node that also has MPI Hello:
+
+```nix
+openqcd-mixed = topology {
+  frontend.exa-atow.apps.openqcd = {
+    enable = true;
+    testFixtures = true;
+  };
+  computeGroups = {
+    compute = {
+      count = 4;
+      node.exa-atow.apps.openqcd.enable = true;
+    };
+    mixed = {
+      count = 1;
+      node.exa-atow.apps = {
+        openqcd.enable = true;
+        mpi-hello.enable = true;
+      };
+    };
+  };
+  testScript = openqcdTest.testScript;
+};
 ```
 
-For host-side validation, keep the combined deployment running and select the
-application contract with the second `just test` argument:
+Then run it like the default:
 
 ```console
-# terminal 1
-$ just up vm multi-software-composition
-
-# terminal 2
-$ just test multi-software-composition mpi-hello
-$ just test multi-software-composition openqcd
+$ just nxc-test openqcd-mixed
+$ just up vm openqcd-mixed
 ```
+
+Each compute node advertises the apps it enables as SLURM features, so jobs can
+target them with `srun --constraint=mpi-hello ...`. The module system checks the
+declaration: a misspelled option, a zero count, or a group name containing
+digits fails at evaluation with a message naming it.

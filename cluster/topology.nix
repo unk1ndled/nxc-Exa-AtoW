@@ -1,17 +1,67 @@
 # The shared cluster: ebuffer, ebservice, a SLURM frontend and controller,
-# and the compute nodes a composition declares. `frontend` and each compute
-# node are NixOS configuration that enables apps from ../apps.
-{
-  frontend,
-  computeNodes,
-  testScript,
-}:
+# and the compute nodes a composition declares. A composition is a module
+# that sets the options below; `frontend` and each group's `node` are NixOS
+# configuration that enables apps from ../apps.
+composition:
 { pkgs, ... }:
 let
+  inherit (pkgs) lib;
+  inherit (lib) mkOption types;
+
+  cluster =
+    (lib.evalModules {
+      modules = [
+        {
+          options = {
+            frontend = mkOption {
+              type = types.attrs;
+              default = { };
+              description = "NixOS configuration of the SLURM frontend.";
+            };
+            computeGroups = mkOption {
+              description = ''
+                Groups of identical compute nodes. A group `compute` with
+                `count = 2` becomes the nodes compute1 and compute2.
+              '';
+              type = types.attrsOf (
+                types.submodule {
+                  options = {
+                    count = mkOption {
+                      type = types.ints.positive;
+                      description = "Number of nodes in the group.";
+                    };
+                    node = mkOption {
+                      type = types.attrs;
+                      default = { };
+                      description = "NixOS configuration of every node in the group.";
+                    };
+                  };
+                }
+              );
+            };
+            testScript = mkOption {
+              type = types.lines;
+              default = "";
+              description = "NXC test run after the cluster readiness checks.";
+            };
+          };
+        }
+        composition
+      ];
+    }).config;
+
+  computeNodes = lib.concatMapAttrs (
+    group:
+    { count, node }:
+    lib.listToAttrs (
+      builtins.map (index: lib.nameValuePair "${group}${toString index}" node) (lib.range 1 count)
+    )
+  ) cluster.computeGroups;
+  invalidGroupNames = builtins.filter (
+    name: builtins.match "[a-z]+(-[a-z]+)*" name == null
+  ) (builtins.attrNames cluster.computeGroups);
+
   computeNodeNames = builtins.attrNames computeNodes;
-  invalidComputeNodeNames = builtins.filter (
-    name: builtins.match "compute[1-9][0-9]*" name == null
-  ) computeNodeNames;
   slurmComputeNodes = builtins.concatStringsSep "," computeNodeNames;
   slurmNodeNames = builtins.map (
     nodeName:
@@ -79,10 +129,10 @@ let
 in
 if computeNodeNames == [ ] then
   builtins.throw "a composition must declare at least one compute node"
-else if invalidComputeNodeNames != [ ] then
+else if invalidGroupNames != [ ] then
   builtins.throw (
-    "compute node names must match compute[1-9][0-9]*; invalid names: "
-    + builtins.concatStringsSep ", " invalidComputeNodeNames
+    "compute group names must be lowercase words joined by '-', without digits; invalid names: "
+    + builtins.concatStringsSep ", " invalidGroupNames
   )
 else
   {
@@ -138,7 +188,7 @@ else
           imports = [
             clusterBase
             ../apps
-            frontend
+            cluster.frontend
           ];
           services.slurm.enableStools = true;
           nxc.sharedDirs."/users".server = "controller";
@@ -154,5 +204,5 @@ else
     }
     // computeRoles;
 
-    testScript = waitForCluster + testScript;
+    testScript = waitForCluster + cluster.testScript;
   }

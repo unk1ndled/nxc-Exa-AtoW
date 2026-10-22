@@ -129,9 +129,9 @@ mpi-calculator = topology {
     enable = true;
     testFixtures = true;
   };
-  computeNodes = {
-    compute1.exa-atow.apps.mpi-calculator.enable = true;
-    compute2.exa-atow.apps.mpi-calculator.enable = true;
+  computeGroups.compute = {
+    count = 2;
+    node.exa-atow.apps.mpi-calculator.enable = true;
   };
   testScript = mpiCalculatorTest.testScript;
 };

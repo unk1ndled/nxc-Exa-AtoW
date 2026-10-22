@@ -18,7 +18,7 @@ docs:
 docs-serve:
     mdbook serve docs
 
-# Build one composition, e.g. `just build vm mpi-hello`.
+# Build one composition, e.g. `just build docker openqcd`.
 build flavour="vm" composition="openqcd":
     nxc build -f {{ flavour }} -C {{ composition }}::{{ flavour }}
 

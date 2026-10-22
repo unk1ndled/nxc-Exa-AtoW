@@ -2,7 +2,7 @@
 
 ## Project Structure & Module Organization
 
-The root holds only files a tool expects there (`flake.nix`, `flake.lock`, `nxc.json`, `justfile`) plus `compositions.nix`. `cluster/` is the shared platform: `cluster/topology.nix` defines ebuffer, ebservice, SLURM, shared storage, and the readiness checks run before every test, and `cluster/ebuffer/` and `cluster/ebservice/` hold the service configuration. Each app under `apps/` is a NixOS module with an `exa-atow.apps.<name>.enable` option (plus `testFixtures` for its NXC test inputs); `apps/default.nix` lists them, and shared modules such as `apps/openmpi.nix` sit beside them. `compositions.nix` lists every composition as per-node configuration that enables apps; compute nodes advertise their enabled apps as SLURM features. An app directory holds its module (`default.nix`), sources, SLURM job, and NXC test script (`test.nix`). `clients/` holds optional clients that drive a running deployment; `clients/python-e2e/` is the Python client for the ebservice API path, with its launch scripts. `scripts/` holds helpers that work without any client. Documentation is in `docs/` (`book.toml`, source in `docs/src/`); `docs/book/`, `build/`, and `deploy/` are generated outputs and should not be edited by hand.
+The root holds only files a tool expects there (`flake.nix`, `flake.lock`, `nxc.json`, `justfile`) plus `compositions.nix`. `cluster/` is the shared platform: `cluster/topology.nix` defines ebuffer, ebservice, SLURM, shared storage, and the readiness checks run before every test, and `cluster/ebuffer/` and `cluster/ebservice/` hold the service configuration. Each app under `apps/` is a NixOS module with an `exa-atow.apps.<name>.enable` option (plus `testFixtures` for its NXC test inputs); `apps/default.nix` lists them, and shared modules such as `apps/openmpi.nix` sit beside them. `compositions.nix` lists every composition as a module setting the options of `cluster/topology.nix`: frontend configuration, `computeGroups.<name> = { count; node; }` (nodes `<name>1..count`), and the test script; compute nodes advertise their enabled apps as SLURM features. An app directory holds its module (`default.nix`), sources, SLURM job, and NXC test script (`test.nix`). `clients/` holds optional clients that drive a running deployment; `clients/python-e2e/` is the Python client for the ebservice API path, with its launch scripts. `scripts/` holds helpers that work without any client. Documentation is in `docs/` (`book.toml`, source in `docs/src/`); `docs/book/`, `build/`, and `deploy/` are generated outputs and should not be edited by hand.
 
 ## Design Invariants
 
@@ -18,7 +18,7 @@ Use the root `justfile` as the command entry point:
 
 - `just install` creates/synchronizes `clients/python-e2e/.venv` from `clients/python-e2e/uv.lock`.
 - `just check` evaluates the flake and its outputs.
-- `just build vm mpi-hello` builds a selected composition; defaults are `vm` and `openqcd`.
+- `just build vm openqcd` builds a selected composition; defaults are `vm` and `openqcd`, the only composition shipped.
 - `just up vm openqcd` starts the topology in the foreground.
 - `just nxc-test [composition]` runs the composition's test inside NXC.
 - `just test [composition] [application]` runs one host E2E against an already running VM deployment.

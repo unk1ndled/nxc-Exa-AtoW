@@ -6,9 +6,9 @@ scientific-computing architectures. A composition groups the machines,
 services, one or more software modules, and tests needed to reproduce one
 architecture.
 
-Today, `mpi-hello` and `openqcd` can run separately, together in
-`multi-software-composition`, or with different node-local availability in
-`heterogeneous-cluster`.
+Today the repository ships one composition, `openqcd`. The `mpi-hello` app is
+available to enable in any composition, alone, together with OpenQCD, or on
+only some compute groups.
 
 ## Repository map
 
@@ -18,7 +18,7 @@ Today, `mpi-hello` and `openqcd` can run separately, together in
 ├── flake.lock                Records the exact dependency revisions
 ├── nxc.json                  Points NXC to the composition catalog
 │
-├── compositions.nix          Every composition: which apps each node enables
+├── compositions.nix          Every composition: compute groups and their apps
 │
 ├── apps/                     One directory per app
 │   ├── default.nix           Imports every app module

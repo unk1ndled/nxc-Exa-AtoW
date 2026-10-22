@@ -37,18 +37,14 @@ flowchart LR
     Runtime -->|SSH through localhost:2222| Frontend
 ```
 
-This repository exposes four NixOS-Compose compositions over one shared HPC
-topology:
+This repository ships one NixOS-Compose composition, `openqcd`: ebuffer,
+ebservice, a SLURM frontend and controller, and the two compute nodes that run
+a small, real OpenQCD 2.0 HMC workload (`ym1`).
 
-- `openqcd` (the default) runs a small, real OpenQCD 2.0 HMC workload;
-- `mpi-hello` is a fast two-node MPI diagnostic;
-- `multi-software-composition` installs and validates both applications;
-- `heterogeneous-cluster` installs MPI Hello only on `compute1` while keeping
-  OpenQCD on both compute nodes.
-
-Every composition deploys ebuffer, ebservice, a SLURM frontend and controller,
-and one or more named compute nodes. Each composition enables apps per node,
-and compute nodes advertise their apps as SLURM features.
+Compute nodes are declared as groups of identical nodes with a `count`, and
+each group enables the apps its nodes run, so another cluster shape is one more
+entry in `compositions.nix`. Compute nodes advertise their apps as SLURM
+features. The `mpi-hello` app is available to enable in such a composition.
 
 To integrate another application, follow the step-by-step
 [mdBook tutorial](docs/src/tutorial/quickstart.md).
@@ -60,7 +56,7 @@ To integrate another application, follow the step-by-step
 | --- | --- | --- |
 | Shared infrastructure | `cluster/topology.nix` | Builds the ebuffer, ebservice, shared-storage, Munge, and SLURM topology, and waits for it to be ready before each test. |
 | Apps | `apps/<name>/` | One NixOS module with an `exa-atow.apps.<name>.enable` option, its sources, a SLURM job, and an NXC test script per app. |
-| Compositions | `compositions.nix` | Every composition: which apps each node enables and which tests run. |
+| Compositions | `compositions.nix` | Every composition: compute groups and their counts, the apps each enables, and which tests run. |
 | Optional API client | `clients/python-e2e/` | Python client that drives a job through ebservice and ebuffer. Not needed to build, deploy, or run the NXC tests. |
 
 To add an application, create `apps/<name>/` following the
@@ -79,10 +75,6 @@ The default `just test` path:
 7. validates the lattice and process grid, one trajectory, configuration
    export, and a finite plaquette on the client.
 
-`just test mpi-hello` follows the same shared lifecycle without an input
-ebuffer. It returns `mpi-hello.out` and requires ranks 0 and 1 to report from
-two distinct compute hosts.
-
 These tests cover the current local package, API, shared-storage, SLURM, MPI,
 and output-transfer paths. They do not establish production security,
 persistent storage, normal remote SCP, full scheduler accounting, large
@@ -96,32 +88,25 @@ adapters and testing shortcuts.
 
 ## Commands
 
-The default flavour is `vm` and the default workload is `openqcd`. For
-`build`, `up`, and `down`, the flavour remains the first optional argument and
-the workload is second:
+The default flavour is `vm` and the default composition is `openqcd`. For
+`build`, `up`, and `down`, the flavour is the first optional argument and the
+composition second:
 
 ```console
 just up                            # openqcd::vm
-just up vm mpi-hello               # mpi-hello::vm
+just up vm my-cluster              # my-cluster::vm, once declared
 
-just down docker                  # stop openqcd::docker
+just down docker                   # stop openqcd::docker
 ```
 
-The two test layers select only a workload because they exercise the VM
+The two test layers select only a composition because they exercise the VM
 flavour:
 
 ```console
 just nxc-test                      # OpenQCD in-topology integration test
-just nxc-test mpi-hello
-just nxc-test multi-software-composition
-
 just tunnel                        # expose the running OpenQCD VM
-just tunnel mpi-hello
-
 just test                          # OpenQCD API-to-SLURM host E2E
-just test mpi-hello
-just test multi-software-composition mpi-hello
-just test multi-software-composition openqcd
+just test my-cluster mpi-hello     # one app's host E2E on another composition
 ```
 
 `just nxc-test` builds the selected composition and runs its test from inside

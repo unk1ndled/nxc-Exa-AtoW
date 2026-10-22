@@ -152,14 +152,14 @@ imports = [
 ```
 
 Then add a composition to `compositions.nix` that enables the app on the
-frontend and both compute nodes:
+frontend and on a group of two compute nodes:
 
 ```nix
 mpi-calculator = topology {
   frontend.exa-atow.apps.mpi-calculator.enable = true;
-  computeNodes = {
-    compute1.exa-atow.apps.mpi-calculator.enable = true;
-    compute2.exa-atow.apps.mpi-calculator.enable = true;
+  computeGroups.compute = {
+    count = 2;
+    node.exa-atow.apps.mpi-calculator.enable = true;
   };
   testScript = "";
 };
@@ -169,23 +169,31 @@ Do not install the app from `cluster/topology.nix`. That file owns the shared
 topology and must remain app-neutral; compositions decide which apps are
 enabled where.
 
-To install several apps together, or different apps on different compute
-nodes, enable them per node. `heterogeneous-cluster` in `compositions.nix` is
-the per-node example. Compute names must match `compute[1-9][0-9]*`, and each
-compute node advertises the apps it enables as SLURM features:
+`computeGroups.compute` with `count = 2` becomes the nodes `compute1` and
+`compute2`, all configured by the same `node`; change `count` to resize the
+group. For different apps on different nodes, declare one group per node type, as in
+the [quick start](../quickstart.md#3-declare-your-own-cluster). Group names are
+lowercase words joined by `-`, and each compute node advertises the apps it
+enables as SLURM features:
 
 ```nix
-computeNodes = {
-  compute1.exa-atow.apps = {
-    mpi-hello.enable = true;
-    openqcd.enable = true;
+computeGroups = {
+  mixed = {
+    count = 1;
+    node.exa-atow.apps = {
+      mpi-hello.enable = true;
+      openqcd.enable = true;
+    };
   };
-  compute2.exa-atow.apps.openqcd.enable = true;
+  compute = {
+    count = 1;
+    node.exa-atow.apps.openqcd.enable = true;
+  };
 };
 ```
 
 Users can target compatible nodes with `srun --constraint=openqcd ...` or an
-exact role with `srun --nodelist=compute1 ...`. Multi-node jobs require enough
+exact node with `srun --nodelist=mixed1 ...`. Multi-node jobs require enough
 nodes that share the selected feature.
 
 `just check` now passes, and the composition runs only the shared readiness
