@@ -140,7 +140,7 @@ else
   {
     roles = {
       ebuffer =
-        { lib, ... }:
+        { ... }:
         {
           imports = [ ../pkgs/ebuffer ];
           networking.firewall.enable = false;
@@ -149,13 +149,6 @@ else
             configDir = ./ebuffer;
             host = "0.0.0.0";
           };
-          systemd.services.ebuffer.preStart = lib.mkForce ''
-            echo "Copying ebuffer config without NFS ownership metadata"
-            cp -r --no-preserve=ownership ${./ebuffer}/* .
-            chmod -R u+w .
-            mkdir -p ./data
-            touch ./data/eb_database.db
-          '';
           environment.systemPackages = [
             pkgs.ebuffer
             pkgs.ebhelpers
@@ -163,7 +156,7 @@ else
         };
 
       ebservice =
-        { lib, ... }:
+        { ... }:
         {
           imports = [ ../pkgs/ebservice ];
           networking.firewall.enable = false;
@@ -173,13 +166,6 @@ else
             configDir = ./ebservice;
             host = "0.0.0.0";
           };
-          systemd.services.ebservice.preStart = lib.mkForce ''
-            echo "Copying ebservice config without NFS ownership metadata"
-            cp -r --no-preserve=ownership ${./ebservice}/* .
-            chmod -R u+w .
-            mkdir -p ./data
-            touch ./data/eb_database.db
-          '';
           environment.systemPackages = [
             pkgs.ebservice
             pkgs.ebhelpers
