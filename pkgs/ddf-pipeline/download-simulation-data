@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+URL="https://sdrive.cnrs.fr/public.php/dav/files/PNmRiW3zc7XmEwN"
+ARCHIVE="sim.tgz"
+
+printf 'Downloading dataset...\n'
+if command -v wget >/dev/null; then
+  wget -q -O "$ARCHIVE" "$URL"
+else
+  curl -fLsS -o "$ARCHIVE" "$URL"
+fi
+
+printf 'Extracting dataset...\n'
+
+tar -xzf "$ARCHIVE"
+
+printf 'Cleaning up archive...\n'
+rm "$ARCHIVE"
+
+printf 'Data is ready in ./Sim.\n'

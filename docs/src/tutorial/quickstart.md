@@ -145,18 +145,18 @@ four OpenQCD nodes plus one node that also has MPI Hello:
 
 ```nix
 openqcd-mixed = topology {
-  frontend.exa-atow.apps.openqcd = {
+  frontend.exa-atow.pkgs.openqcd = {
     enable = true;
     testFixtures = true;
   };
   computeGroups = {
     compute = {
       count = 4;
-      node.exa-atow.apps.openqcd.enable = true;
+      node.exa-atow.pkgs.openqcd.enable = true;
     };
     mixed = {
       count = 1;
-      node.exa-atow.apps = {
+      node.exa-atow.pkgs = {
         openqcd.enable = true;
         mpi-hello.enable = true;
       };

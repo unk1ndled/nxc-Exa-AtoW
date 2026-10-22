@@ -20,7 +20,7 @@ ebservice, starts the runtime, submits to SLURM over SSH, downloads the result,
 and checks its meaning on the host.
 
 This is more than a packaging exercise. An app is part of the repository once
-its module is imported from `apps/default.nix` and a composition in
+its module is imported from `pkgs/modules.nix` and a composition in
 `compositions.nix` enables it and runs its in-topology test. The host-side
 contract is optional.
 
@@ -58,16 +58,18 @@ has six machines and can take several minutes to build for the first time.
 ## Follow one name through the repository
 
 Choose the app name before creating files. Here it is `mpi-calculator`; it
-names the directory, the `exa-atow.apps.mpi-calculator` options, the SLURM
+names the directory, the `exa-atow.pkgs.mpi-calculator` options, the SLURM
 feature, and the composition.
 
 ```text
-apps/mpi-calculator/
-  ├─ default.nix            NixOS module: enable option, package, test fixture
+pkgs/mpi-calculator/
+  ├─ package.nix            how to build it
+  ├─ default.nix            NixOS module: enable and package options, test fixture
   ├─ mpi-calculator.c       source
   ├─ mpi-calculator.sbatch  SLURM job
   └─ test.nix               NXC test script
-apps/default.nix            imports ./mpi-calculator
+pkgs/packages.nix           mpi-calculator = prev.callPackage ...;
+pkgs/modules.nix            imports ./mpi-calculator
 compositions.nix            mpi-calculator = topology { ... };
         └─> mpi-calculator::vm
 
@@ -77,8 +79,9 @@ Optional host client, only for the ebservice API path:
   clients/python-e2e/minimal-e2e.py
 ```
 
-Nothing is discovered automatically. `apps/default.nix` lists every app
-module, and `compositions.nix` lists every composition; adding the app is one
-line in the first and one entry in the second.
+Nothing is discovered automatically. `pkgs/packages.nix` lists every package,
+`pkgs/modules.nix` every package module, and `compositions.nix` every
+composition; adding the app is one line in each of the first two and one entry
+in the third.
 
 Continue with [Write and package the application](program-and-package.md).

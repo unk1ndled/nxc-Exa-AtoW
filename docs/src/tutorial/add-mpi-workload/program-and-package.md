@@ -5,7 +5,7 @@ app module. The next chapter adds the matching NXC test.
 
 ## 1. Write a tiny two-rank program
 
-Create `apps/mpi-calculator/mpi-calculator.c`:
+Create `pkgs/mpi-calculator/mpi-calculator.c`:
 
 ```c
 #include <errno.h>
@@ -93,58 +93,78 @@ processes on one node.
 
 ## 2. Package and install the program with Nix
 
-Create `apps/mpi-calculator/default.nix`:
+A package directory keeps two things apart: `package.nix` says how to build the
+program, and `default.nix` is the NixOS module that installs it.
+
+Create `pkgs/mpi-calculator/package.nix`:
+
+```nix
+{ stdenv, openmpi }:
+
+stdenv.mkDerivation {
+  pname = "mpi-calculator";
+  version = "1.0";
+  src = ./mpi-calculator.c;
+  dontUnpack = true;
+  nativeBuildInputs = [ openmpi ];
+
+  buildPhase = ''
+    runHook preBuild
+    mpicc "$src" -o mpi-calculator
+    runHook postBuild
+  '';
+
+  installPhase = ''
+    runHook preInstall
+    install -Dm755 mpi-calculator "$out/bin/mpi-calculator"
+    runHook postInstall
+  '';
+}
+```
+
+Add it to the overlay in `pkgs/packages.nix`, which makes it `pkgs.mpi-calculator`
+everywhere and `nix build .#mpi-calculator` once it is also listed under
+`packages` in `flake.nix`:
+
+```nix
+mpi-calculator = prev.callPackage ./mpi-calculator/package.nix { };
+```
+
+Then create the module, `pkgs/mpi-calculator/default.nix`:
 
 ```nix
 { config, lib, pkgs, ... }:
 let
-  cfg = config.exa-atow.apps.mpi-calculator;
-
-  mpiCalculator = pkgs.stdenv.mkDerivation {
-    pname = "mpi-calculator";
-    version = "1.0";
-    src = ./mpi-calculator.c;
-    dontUnpack = true;
-    nativeBuildInputs = [ pkgs.openmpi ];
-
-    buildPhase = ''
-      runHook preBuild
-      mpicc "$src" -o mpi-calculator
-      runHook postBuild
-    '';
-
-    installPhase = ''
-      runHook preInstall
-      install -Dm755 mpi-calculator "$out/bin/mpi-calculator"
-      runHook postInstall
-    '';
-  };
+  cfg = config.exa-atow.pkgs.mpi-calculator;
 in
 {
-  options.exa-atow.apps.mpi-calculator.enable =
-    lib.mkEnableOption "the MPI calculator example";
+  options.exa-atow.pkgs.mpi-calculator = {
+    enable = lib.mkEnableOption "the MPI calculator example";
+    package = lib.mkPackageOption pkgs "mpi-calculator" { };
+  };
 
   config = lib.mkIf cfg.enable {
     exa-atow.openmpi.enable = true;
-    environment.systemPackages = [ mpiCalculator ];
+    environment.systemPackages = [ cfg.package ];
   };
 }
 ```
 
 There are two distinct uses of OpenMPI here. `nativeBuildInputs` makes `mpicc`
 available while Nix builds the C program. Setting `exa-atow.openmpi.enable`
-turns on `apps/openmpi.nix`, which installs the MPI runtime in the machines
+turns on `pkgs/openmpi.nix`, which installs the MPI runtime in the machines
 and applies the TCP transport settings used by this VM topology.
 
-Every machine imports every app module, so the option exists everywhere, but
+Every machine imports every package module, so the option exists everywhere, but
 the module does nothing until a composition sets
-`exa-atow.apps.mpi-calculator.enable = true`.
+`exa-atow.pkgs.mpi-calculator.enable = true`.
 
-Add the directory to `apps/default.nix`:
+Add the directory to `pkgs/modules.nix`:
 
 ```nix
 imports = [
   ./openmpi.nix
+  ./ddf-pipeline
   ./mpi-calculator
   ./mpi-hello
   ./openqcd
@@ -156,10 +176,10 @@ frontend and on a group of two compute nodes:
 
 ```nix
 mpi-calculator = topology {
-  frontend.exa-atow.apps.mpi-calculator.enable = true;
+  frontend.exa-atow.pkgs.mpi-calculator.enable = true;
   computeGroups.compute = {
     count = 2;
-    node.exa-atow.apps.mpi-calculator.enable = true;
+    node.exa-atow.pkgs.mpi-calculator.enable = true;
   };
   testScript = "";
 };
@@ -180,14 +200,14 @@ enables as SLURM features:
 computeGroups = {
   mixed = {
     count = 1;
-    node.exa-atow.apps = {
+    node.exa-atow.pkgs = {
       mpi-hello.enable = true;
       openqcd.enable = true;
     };
   };
   compute = {
     count = 1;
-    node.exa-atow.apps.openqcd.enable = true;
+    node.exa-atow.pkgs.openqcd.enable = true;
   };
 };
 ```

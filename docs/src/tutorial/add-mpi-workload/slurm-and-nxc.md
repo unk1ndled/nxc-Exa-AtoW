@@ -6,7 +6,7 @@ self-contained NXC integration test.
 
 ## 3. Make a direct SLURM example
 
-Create `apps/mpi-calculator/mpi-calculator.sbatch`:
+Create `pkgs/mpi-calculator/mpi-calculator.sbatch`:
 
 ```bash
 #!/usr/bin/env bash
@@ -47,11 +47,11 @@ The NXC layer answers a focused question: after NixOS Compose has booted the
 machines, can a normal frontend user submit this program through SLURM and get
 a meaningful result on shared storage?
 
-Create `apps/mpi-calculator/test.nix`:
+Create `pkgs/mpi-calculator/test.nix`:
 
 ```nix
 # Runs on the frontend once the cluster is ready. Needs
-# `exa-atow.apps.mpi-calculator.testFixtures = true` on the frontend.
+# `exa-atow.pkgs.mpi-calculator.testFixtures = true` on the frontend.
 rec {
   testDir = "/users/user1/mpi-calculator-e2e";
 
@@ -70,26 +70,25 @@ root would hide ownership and login-environment mistakes.
 
 The job has to be on shared storage before the test submits it. That fixture
 belongs to the app module, behind a second option, so only the frontend of a
-test composition stages it. In `apps/mpi-calculator/default.nix`, read
+test composition stages it. In `pkgs/mpi-calculator/default.nix`, read
 `testDir` from the test file and replace the `options` and `config` blocks:
 
 ```nix
 let
-  cfg = config.exa-atow.apps.mpi-calculator;
+  cfg = config.exa-atow.pkgs.mpi-calculator;
   inherit (import ./test.nix) testDir;
-
-  mpiCalculator = ...; # unchanged
 in
 {
-  options.exa-atow.apps.mpi-calculator = {
+  options.exa-atow.pkgs.mpi-calculator = {
     enable = lib.mkEnableOption "the MPI calculator example";
+    package = lib.mkPackageOption pkgs "mpi-calculator" { };
     testFixtures = lib.mkEnableOption "staging the test job in user1's NFS home";
   };
 
   config = lib.mkMerge [
     (lib.mkIf cfg.enable {
       exa-atow.openmpi.enable = true;
-      environment.systemPackages = [ mpiCalculator ];
+      environment.systemPackages = [ cfg.package ];
     })
 
     (lib.mkIf cfg.testFixtures {
@@ -120,18 +119,18 @@ matters: `/users` is shared by the controller, frontend, and compute nodes,
 and the fixture must not run before that mount is ready.
 
 Finally, turn on the fixture and the test in the `mpi-calculator` composition.
-Add `mpiCalculatorTest = import ./apps/mpi-calculator/test.nix;` to the `let`
+Add `mpiCalculatorTest = import ./pkgs/mpi-calculator/test.nix;` to the `let`
 block at the top of `compositions.nix`, then:
 
 ```nix
 mpi-calculator = topology {
-  frontend.exa-atow.apps.mpi-calculator = {
+  frontend.exa-atow.pkgs.mpi-calculator = {
     enable = true;
     testFixtures = true;
   };
   computeGroups.compute = {
     count = 2;
-    node.exa-atow.apps.mpi-calculator.enable = true;
+    node.exa-atow.pkgs.mpi-calculator.enable = true;
   };
   testScript = mpiCalculatorTest.testScript;
 };

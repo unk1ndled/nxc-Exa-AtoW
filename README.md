@@ -54,12 +54,12 @@ To integrate another application, follow the step-by-step
 
 | Layer | Location | Responsibility |
 | --- | --- | --- |
-| Shared infrastructure | `cluster/topology.nix` | Builds the ebuffer, ebservice, shared-storage, Munge, and SLURM topology, and waits for it to be ready before each test. |
-| Apps | `apps/<name>/` | One NixOS module with an `exa-atow.apps.<name>.enable` option, its sources, a SLURM job, and an NXC test script per app. |
-| Compositions | `compositions.nix` | Every composition: compute groups and their counts, the apps each enables, and which tests run. |
-| Optional API client | `clients/python-e2e/` | Python client that drives a job through ebservice and ebuffer. Not needed to build, deploy, or run the NXC tests. |
+| Shared infrastructure | `cluster/` | `topology.nix` instantiates the ebuffer, ebservice, shared-storage, Munge, and SLURM topology and waits for it before each test; `ebuffer/` and `ebservice/` hold the service configuration. |
+| Packages | `pkgs/<name>/` | Every package, including the platform services: `package.nix` builds it; deployable ones add a NixOS module (`default.nix`), and scientific ones expose `exa-atow.pkgs.<name>.enable`, sources, a SLURM job, and an NXC test script. |
+| Compositions | `compositions.nix` | Every composition: compute groups and their counts, the packages each enables, and which tests run. |
+| Clients | `clients/` | Optional Exa-AToW infrastructure clients; today `python-e2e/` drives a job through ebservice and ebuffer. Not needed to build, deploy, or run the NXC tests. |
 
-To add an application, create `apps/<name>/` following the
+To add an application, create `pkgs/<name>/` following the
 [tutorial](docs/src/tutorial/quickstart.md).
 
 ## End-to-end behavior
@@ -68,7 +68,7 @@ The default `just test` path:
 
 1. authenticates with ebservice;
 2. registers the OpenQCD microservice and compatible runtime;
-3. uploads `apps/openqcd/openqcd-ym1.in` and creates scheduler and output ebuffers;
+3. uploads `pkgs/openqcd/openqcd-ym1.in` and creates scheduler and output ebuffers;
 4. submits a two-node SLURM job through the frontend;
 5. runs one `ym1` rank on each compute VM;
 6. returns `openqcd-e2e.log` through ebuffer;

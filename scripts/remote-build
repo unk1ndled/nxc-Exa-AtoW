@@ -1,0 +1,82 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+LOCAL_BIN_DIR="${LOCAL_BIN_DIR:-/home/msalmane/.local/bin}"
+TARGET_DIR="${TARGET_DIR:-$PWD}"
+REMOTE_STORE="${REMOTE_STORE:-mounted-ssh-ng://doozer@nix-datamove}"
+
+export PATH="$LOCAL_BIN_DIR:$PATH"
+
+VERBOSE=0
+LOG_FILE=""
+
+while [[ "${1:-}" == -* ]]; do
+    case "$1" in
+        -v|--verbose)
+            VERBOSE=1
+            shift
+            ;;
+        -l|--log-file)
+            LOG_FILE="$2"
+            shift 2
+            ;;
+        -t|--target-dir)
+            TARGET_DIR="$2"
+            shift 2
+            ;;
+        -s|--store)
+            REMOTE_STORE="$2"
+            shift 2
+            ;;
+        *)
+            printf "Unknown option: %s\n" "$1"
+            printf "Usage: %s [-v|--verbose] [-l logfile] [-t target_dir] [-s remote_store] <package-name>\n" "$0"
+            exit 1
+            ;;
+    esac
+done
+
+if [ -z "${1:-}" ]; then
+    printf "Usage: %s [-v|--verbose] [-l logfile] [-t target_dir] [-s remote_store] <package-name>\n" "$0"
+    exit 1
+fi
+
+PACKAGE="$1"
+
+if [ "$VERBOSE" -eq 1 ] && [ -z "$LOG_FILE" ]; then
+    LOG_FILE="nix-build-${PACKAGE}-$(date +%Y%m%d-%H%M%S).log"
+fi
+
+if cd "$TARGET_DIR"; then
+    printf "Directory changed to %s\n" "$TARGET_DIR"
+
+    printf "setup remote store\n"
+    setup-remote-nix.sh
+
+    printf "Starting nix build for package: %s...\n" "$PACKAGE"
+
+    NIX_CMD=(
+        nix --extra-experimental-features "nix-command flakes mounted-ssh-store"
+        build
+        --store "$REMOTE_STORE"
+        --no-link
+        --json
+        ".#${PACKAGE}"
+    )
+
+    if [ "$VERBOSE" -eq 1 ]; then
+        NIX_CMD+=(-L -vv)
+    fi
+
+    if [ "$VERBOSE" -eq 1 ]; then
+        printf "Logging to file: %s\n" "$LOG_FILE"
+        "${NIX_CMD[@]}" 2>&1 | tee "$LOG_FILE"
+    else
+        "${NIX_CMD[@]}"
+    fi
+
+else
+    printf "Error: Could not find directory %s\n" "$TARGET_DIR"
+    exit 1
+fi

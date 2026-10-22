@@ -1,7 +1,7 @@
 # The shared cluster: ebuffer, ebservice, a SLURM frontend and controller,
 # and the compute nodes a composition declares. A composition is a module
 # that sets the options below; `frontend` and each group's `node` are NixOS
-# configuration that enables apps from ../apps.
+# configuration that enables packages from ../pkgs.
 composition:
 { pkgs, ... }:
 let
@@ -66,9 +66,11 @@ let
   slurmNodeNames = builtins.map (
     nodeName:
     let
-      # Each node advertises the apps it enables as SLURM features.
-      apps = computeNodes.${nodeName}.exa-atow.apps or { };
-      features = builtins.filter (app: apps.${app}.enable or false) (builtins.attrNames apps);
+      # Each node advertises the packages it enables as SLURM features.
+      packages = computeNodes.${nodeName}.exa-atow.pkgs or { };
+      features = builtins.filter (name: packages.${name}.enable or false) (
+        builtins.attrNames packages
+      );
       featureConfig =
         if features == [ ] then "" else " Feature=${builtins.concatStringsSep "," features}";
     in
@@ -107,7 +109,7 @@ let
     {
       imports = [
         clusterBase
-        ../apps
+        ../pkgs/modules.nix
         node
       ];
       services.slurm.client.enable = true;
@@ -140,6 +142,7 @@ else
       ebuffer =
         { lib, ... }:
         {
+          imports = [ ../pkgs/ebuffer ];
           networking.firewall.enable = false;
           services.ebuffer = {
             enable = true;
@@ -162,6 +165,7 @@ else
       ebservice =
         { lib, ... }:
         {
+          imports = [ ../pkgs/ebservice ];
           networking.firewall.enable = false;
           services.ebservice = {
             enable = true;
@@ -187,7 +191,7 @@ else
         {
           imports = [
             clusterBase
-            ../apps
+            ../pkgs/modules.nix
             cluster.frontend
           ];
           services.slurm.enableStools = true;

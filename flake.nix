@@ -3,7 +3,6 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/25.05";
-    exaAtowPkgs.url = "git+https://gricad-gitlab.univ-grenoble-alpes.fr/exa-atow/exa-atow-nix-pkgs.git";
     nxc.url = "git+https://gitlab.inria.fr/nixos-compose/nixos-compose.git?ref=main";
   };
 
@@ -11,14 +10,15 @@
     {
       self,
       nixpkgs,
-      exaAtowPkgs,
       nxc,
     }:
     let
       system = "x86_64-linux";
+      # Every package this repository defines.
+      overlay = import ./pkgs/packages.nix;
       pkgs = import nixpkgs {
         inherit system;
-        overlays = [ exaAtowPkgs.overlays.default ];
+        overlays = [ overlay ];
       };
       e2eFhs = pkgs.buildFHSEnv {
         name = "e2e-fhs";
@@ -33,17 +33,36 @@
       };
       composed = nxc.lib.compose {
         inherit nixpkgs system;
+        overlays = [ overlay ];
         compositions = import ./compositions.nix;
-        overlays = [ exaAtowPkgs.overlays.default ];
-        extraConfigurations = [ exaAtowPkgs.nixosModules.default ];
       };
     in
     {
       # NXC adds a non-derivation compositionsNames list, which `nxc build`
       # without -C reads; packages must contain only derivations.
       packages.${system} = builtins.removeAttrs composed [ "compositionsNames" ] // {
+        inherit (pkgs)
+          ebuffer
+          ebservice
+          ebhelpers
+          openqcd
+          mpi-hello
+          ebcommon
+          remotemanager
+          ebsclient
+          ebstemplate
+          ;
+        # Not exposed here: ddfacet, kill-ms, ddf-pipeline, and ebuffer-tests
+        # fetch private repositories over SSH when evaluated.
         default = composed."openqcd::vm";
       };
+      # For other flakes: the packages and the two service modules.
+      overlays.default = overlay;
+      nixosModules = {
+        ebuffer = ./pkgs/ebuffer;
+        ebservice = ./pkgs/ebservice;
+      };
+
       legacyPackages.${system}.compositionsNames = composed.compositionsNames;
       devShells.${system}.default = pkgs.mkShell {
         inputsFrom = [ nxc.devShells.${system}.nxcShell ];

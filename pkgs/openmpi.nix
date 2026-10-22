@@ -1,4 +1,4 @@
-# OpenMPI over TCP, shared by the MPI apps.
+# OpenMPI over TCP, shared by the MPI packages.
 { config, lib, pkgs, ... }:
 {
   options.exa-atow.openmpi.enable = lib.mkEnableOption "OpenMPI over TCP";

@@ -1,5 +1,5 @@
 # Runs on the frontend once the cluster is ready. Needs
-# `exa-atow.apps.openqcd.testFixtures = true` on the frontend.
+# `exa-atow.pkgs.openqcd.testFixtures = true` on the frontend.
 rec {
   testDir = "/users/user1/openqcd-e2e";
 

@@ -1,18 +1,19 @@
 { config, lib, pkgs, ... }:
 let
-  cfg = config.exa-atow.apps.openqcd;
+  cfg = config.exa-atow.pkgs.openqcd;
   inherit (import ./test.nix) testDir;
 in
 {
-  options.exa-atow.apps.openqcd = {
+  options.exa-atow.pkgs.openqcd = {
     enable = lib.mkEnableOption "OpenQCD";
+    package = lib.mkPackageOption pkgs "openqcd" { };
     testFixtures = lib.mkEnableOption "staging the test job and input in user1's NFS home";
   };
 
   config = lib.mkMerge [
     (lib.mkIf cfg.enable {
       exa-atow.openmpi.enable = true;
-      environment.systemPackages = [ pkgs.openQCD ];
+      environment.systemPackages = [ cfg.package ];
     })
 
     (lib.mkIf cfg.testFixtures {

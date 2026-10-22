@@ -54,9 +54,9 @@ once.
 
 | Symptom | Likely cause and first place to look |
 | --- | --- |
-| Flake evaluation reports that `exa-atow.apps.mpi-calculator` does not exist | `apps/default.nix` does not import `./mpi-calculator`. |
-| `command -v mpi-calculator` fails | The node does not set `exa-atow.apps.mpi-calculator.enable = true` in `compositions.nix`, or the package is not in `environment.systemPackages` in `apps/mpi-calculator/default.nix`. |
-| `setup-mpi-calculator-test.service` does not exist | The frontend does not set `exa-atow.apps.mpi-calculator.testFixtures = true`. |
+| Flake evaluation reports that `exa-atow.pkgs.mpi-calculator` does not exist | `pkgs/modules.nix` does not import `./mpi-calculator`. |
+| `command -v mpi-calculator` fails | The node does not set `exa-atow.pkgs.mpi-calculator.enable = true` in `compositions.nix`, or the package is not in `environment.systemPackages` in `pkgs/mpi-calculator/default.nix`. |
+| `setup-mpi-calculator-test.service` does not exist | The frontend does not set `exa-atow.pkgs.mpi-calculator.testFixtures = true`. |
 | The SLURM job stays pending | The request exceeds the VM resources, or a compute daemon is not ready. Inspect `squeue`, `scontrol show job <id>`, and `sinfo` on the frontend. |
 | `srun` reports an MPI or PMIx error | Confirm `--mpi=pmix`, `exa-atow.openmpi.enable = true` in the app module, and the default `QEMU_OPTS=-cpu host` path. |
 | SLURM completes but the host E2E cannot return output | `output_name`, the path written by `scheduler_core`, and `diagnostic_files` must use the same filename. |
@@ -74,11 +74,11 @@ Before committing, the new app should have these files:
 
 | Concern | File |
 | --- | --- |
-| Source | `apps/mpi-calculator/mpi-calculator.c` |
-| Nix package, runtime, and test fixture | `apps/mpi-calculator/default.nix` |
-| Direct scheduler job | `apps/mpi-calculator/mpi-calculator.sbatch` |
-| NXC assertions | `apps/mpi-calculator/test.nix` |
-| Module import | `apps/default.nix` |
+| Source | `pkgs/mpi-calculator/mpi-calculator.c` |
+| Nix package, runtime, and test fixture | `pkgs/mpi-calculator/default.nix` |
+| Direct scheduler job | `pkgs/mpi-calculator/mpi-calculator.sbatch` |
+| NXC assertions | `pkgs/mpi-calculator/test.nix` |
+| Module import | `pkgs/modules.nix` |
 | Composition | `mpi-calculator` in `compositions.nix` |
 
 If you also use the optional host client:
@@ -109,7 +109,7 @@ The calculator keeps source beside its Nix module, which is convenient for a
 small demonstrator. A real application can instead use a pinned Nix package,
 an overlay package, or a derivation that fetches a released source archive.
 Keep the same boundary: package and runtime settings belong under
-`apps/<name>/`, not in `cluster/topology.nix`.
+`pkgs/<name>/`, not in `cluster/topology.nix`.
 
 Likewise, replace the fixed operands with representative input files and
 validate scientific meaning rather than only process exit status. Good E2E

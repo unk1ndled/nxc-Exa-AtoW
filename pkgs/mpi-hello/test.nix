@@ -1,5 +1,5 @@
 # Runs on the frontend once the cluster is ready. Needs
-# `exa-atow.apps.mpi-hello.testFixtures = true` on the frontend.
+# `exa-atow.pkgs.mpi-hello.testFixtures = true` on the frontend.
 rec {
   testDir = "/users/user1/mpi-hello-e2e";
 

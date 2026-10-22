@@ -1,38 +1,19 @@
 { config, lib, pkgs, ... }:
 let
-  cfg = config.exa-atow.apps.mpi-hello;
+  cfg = config.exa-atow.pkgs.mpi-hello;
   inherit (import ./test.nix) testDir;
-
-  mpiHello = pkgs.stdenv.mkDerivation {
-    pname = "mpi-hello";
-    version = "1.0";
-    src = ./mpi-hello.c;
-    dontUnpack = true;
-    nativeBuildInputs = [ pkgs.openmpi ];
-
-    buildPhase = ''
-      runHook preBuild
-      mpicc "$src" -o mpi-hello
-      runHook postBuild
-    '';
-
-    installPhase = ''
-      runHook preInstall
-      install -Dm755 mpi-hello "$out/bin/mpi-hello"
-      runHook postInstall
-    '';
-  };
 in
 {
-  options.exa-atow.apps.mpi-hello = {
+  options.exa-atow.pkgs.mpi-hello = {
     enable = lib.mkEnableOption "the MPI Hello example";
+    package = lib.mkPackageOption pkgs "mpi-hello" { };
     testFixtures = lib.mkEnableOption "staging the test job in user1's NFS home";
   };
 
   config = lib.mkMerge [
     (lib.mkIf cfg.enable {
       exa-atow.openmpi.enable = true;
-      environment.systemPackages = [ mpiHello ];
+      environment.systemPackages = [ cfg.package ];
     })
 
     (lib.mkIf cfg.testFixtures {

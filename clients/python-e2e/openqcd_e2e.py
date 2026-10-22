@@ -7,7 +7,7 @@ from common import E2EApplication, run_e2e
 
 
 ROOT = Path(__file__).resolve().parent
-OPENQCD_INPUT = ROOT.parents[1] / "apps" / "openqcd" / "openqcd-ym1.in"
+OPENQCD_INPUT = ROOT.parents[1] / "pkgs" / "openqcd" / "openqcd-ym1.in"
 OPENQCD_LOG = "openqcd-e2e.log"
 
 
