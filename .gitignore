@@ -1,11 +1,13 @@
-build
-deploy
+# Generated outputs. NXC always writes build/ and deploy/ next to nxc.json;
+# everything else is scoped to the tool's own folder.
+/build/
+/deploy/
+/result*
 /docs/book/
 .pytest_cache/
 .venv/
 __pycache__/
 *.pyc
 # remotemanager fallback-command files, if a process is interrupted.
-/????????.sh
 /clients/python-e2e/????????.sh
 *.log
