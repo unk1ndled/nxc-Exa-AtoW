@@ -38,16 +38,18 @@ nxc-test composition="openqcd": (build "vm" composition)
 tunnel composition="openqcd":
     bash scripts/tunnel.sh deploy/{{ composition }}::vm.json
 
-# Optional Python client: sync its locked environment.
+[group('optional')]
 install:
     uv sync --project clients/python-e2e
-
-# Optional Python client: run one application's host E2E against `just up`.
 test composition="openqcd" application=composition: (tunnel composition)
     e2e-fhs -c "uv run --project clients/python-e2e bash clients/python-e2e/run-e2e.sh {{ application }} vm-tunnel deploy/{{ composition }}::vm.json {{ composition }}"
 
-# Optional Python client: reserve, deploy, and test on Grid'5000, then release the job.
-# Runs outside the dev shell: the script finds a user-installed Nix on the frontend itself.
 [script("bash")]
 g5k-e2e composition="openqcd" application=composition walltime="1:00:00" duration="1h":
     bash clients/python-e2e/g5k-e2e.sh {{ composition }} {{ application }} {{ walltime }} {{ duration }}
+web-install:
+    cd clients/web/webapp && bun install
+    e2e-fhs -c "uv sync --project clients/web/server"
+web-dev composition="openqcd":
+    TUNNEL_BIND_ADDRESS=$(docker network inspect bridge | jq -r '.[0].IPAM.Config[0].Gateway') bash scripts/tunnel.sh deploy/{{ composition }}::vm.json
+    (cd clients/web/webapp && bun run dev) & e2e-fhs -c "uv run --directory clients/web/server uvicorn main:app --port 9000"
