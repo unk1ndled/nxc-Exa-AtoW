@@ -138,6 +138,7 @@ else if invalidGroupNames != [ ] then
   )
 else
   {
+    # concrete nxc composition declaration
     roles = {
       ebuffer =
         { ... }:
