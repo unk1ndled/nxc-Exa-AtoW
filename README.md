@@ -32,5 +32,5 @@ and the [development notes](docs/src/DevNotes.md) for local testing shortcuts.
 | `cluster/` | Shared topology: ebuffer, ebservice, SLURM, shared storage, readiness checks. |
 | `pkgs/<name>/` | One package per directory, with its NixOS module and NXC test when deployable. |
 | `compositions.nix` | Every composition: compute groups, enabled packages, test script. |
-| `clients/` | Optional infrastructure clients, e.g. the Python E2E. Not needed to build or test. |
+| `clients/` | Optional infrastructure clients: the Python E2E and the web notebook client. Not needed to build or test. |
 | `docs/` | The mdBook (`just docs`, `just docs-serve`). |
