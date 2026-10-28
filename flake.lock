@@ -111,11 +111,11 @@
         "unstable": "unstable"
       },
       "locked": {
-        "lastModified": 1792483039,
-        "narHash": "sha256-4K8g65U3dYU1hZW7qEuLcJOLpc9iRJhKPN8yN/KlRfI=",
+        "lastModified": 1793090659,
+        "narHash": "sha256-UdBlS3mCzA+lIemvAmDbxkRJjZj+R82Bm16KrrIdT3g=",
         "ref": "main",
-        "rev": "ec0e54b4d9ec86030fd725b3035c3ed14f0ecd1c",
-        "revCount": 824,
+        "rev": "4f9bd4fa29686e1523724d57ced5e6030e9dfed3",
+        "revCount": 827,
         "type": "git",
         "url": "https://gitlab.inria.fr/nixos-compose/nixos-compose.git"
       },
