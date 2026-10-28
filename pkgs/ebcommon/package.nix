@@ -9,12 +9,12 @@
 
 buildPythonPackage rec {
   pname = "ebcommon";
-  version = "1.0.0";
+  version = "2.0.0";
   pyproject = true;
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-PKug9iU/o3klW/dDhgfrt5h6Vc9MmIKYVH7zkkoy7iI=";
+    hash = "sha256-a5RbXpQzObavrJKwvXZaxk/iiDLURG0hCrzgOszRU+4=";
   };
 
   build-system = [ setuptools ];

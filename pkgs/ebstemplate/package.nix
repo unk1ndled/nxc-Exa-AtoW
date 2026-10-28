@@ -11,12 +11,12 @@
 
 buildPythonPackage rec {
   pname = "ebstemplate";
-  version = "0.1.1";
+  version = "0.2.0";
   pyproject = true;
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-iCvkfv0ruP4I9rR094c4QfNRKH7iK4dydiFtacM8rrA=";
+    hash = "sha256-g3BLiNd0TuydWLVd+R1qqEtmgmZ5MPBO92St/AO1hhE=";
   };
 
   build-system = [ setuptools ];

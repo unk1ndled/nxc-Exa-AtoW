@@ -13,12 +13,12 @@
 
 buildPythonPackage rec {
   pname = "ebuffer";
-  version = "0.1.5";
+  version = "0.3.0";
   pyproject = true;
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-Dv13IF5O0V4aHUGPJ+5I6hSMeOYDEbDU1w6o3ytwDTc=";
+    hash = "sha256-1j0ygbaptlouCJ8F5VMiZvYAhnLCvGJ1eb2aEK28Vl4=";
   };
 
   build-system = [ setuptools ];

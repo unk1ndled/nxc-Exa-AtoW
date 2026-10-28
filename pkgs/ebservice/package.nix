@@ -14,12 +14,12 @@
 
 buildPythonPackage rec {
   pname = "ebservice";
-  version = "0.1.0";
+  version = "0.3.0";
   pyproject = true;
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-xB9SdTCWSvld2XX6kOdoKmBivMem7+Ofq7wTVj9akUs=";
+    hash = "sha256-j7ZSDrpln/qeu1iNSrRz8ilyjFuaAzJWdSmeJxCnxtk=";
   };
 
   build-system = [ setuptools ];

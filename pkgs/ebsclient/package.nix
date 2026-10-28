@@ -10,12 +10,12 @@
 
 buildPythonPackage rec {
   pname = "ebsclient";
-  version = "0.1.1";
+  version = "0.2.0";
   pyproject = true;
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-7pfYe4KRp1ZAc5DqvJwW50JOHI7xvbcNoqmXXaxinhI=";
+    hash = "sha256-16XFncG1nDQPFBXpbi7Qeqxtx/pxyVNr/J/QNlrHTe0=";
   };
 
   build-system = [ setuptools ];
