@@ -38,6 +38,8 @@ together, or on only some compute groups.
 │
 ├── cluster/                  The system instance, the same for every composition
 │   ├── topology.nix          Roles, services, SLURM, shared storage, readiness checks
+│   ├── lib.nix               Composition options, compute-node expansion, SLURM
+│   │                         node lines, readiness checks used by topology.nix
 │   ├── ebuffer/              Data-buffer service configuration
 │   └── ebservice/            Job-service configuration
 │
