@@ -68,6 +68,7 @@
         inputsFrom = [ nxc.devShells.${system}.nxcShell ];
         packages = [
           e2eFhs
+          pkgs.bun
           pkgs.jq
           pkgs.just
           pkgs.mdbook

@@ -10,6 +10,10 @@ if [[ ! -f "$deployment_file" ]]; then
 fi
 deployment_file=$(realpath "$deployment_file")
 
+# Host address the API tunnels listen on. Loopback by default; the web client
+# sets it to the Docker bridge gateway so its sandboxed kernels can reach the APIs.
+bind_address="${TUNNEL_BIND_ADDRESS:-127.0.0.1}"
+
 identity_file=$(realpath "${NXC_IDENTITY_FILE:-$HOME/.ssh/id_rsa}")
 if [[ ! -f "$identity_file" ]]; then
   echo "SSH identity not found: $identity_file" >&2
@@ -66,27 +70,28 @@ while IFS=$'\t' read -r vm_id role; do
     remote_port=22
   fi
 
-  control_socket="$control_dir/$role.sock"
+  # One master per role and address, so loopback and bridge tunnels coexist.
+  control_socket="$control_dir/$role@$bind_address.sock"
   if [[ -S "$control_socket" ]] && ssh "${ssh_options[@]}" \
     -S "$control_socket" -O check -p "$ssh_port" root@localhost \
     >/dev/null 2>&1; then
     forwarded["$role"]=1
-    echo "reuse $role tunnel on localhost:${service_port}"
+    echo "reuse $role tunnel on ${bind_address}:${service_port}"
     continue
   fi
   rm -f "$control_socket"
 
   if ssh "${ssh_options[@]}" -M -S "$control_socket" -fN -p "$ssh_port" \
-    -L "127.0.0.1:${service_port}:localhost:${remote_port}" \
+    -L "${bind_address}:${service_port}:localhost:${remote_port}" \
     root@localhost </dev/null; then
     forwarded["$role"]=1
     if [[ "$role" == frontend ]]; then
-      echo "frontend SSH: localhost:${service_port}"
+      echo "frontend SSH: ${bind_address}:${service_port}"
     else
-      echo "$role API: http://localhost:${service_port}/api/v1"
+      echo "$role API: http://${bind_address}:${service_port}/api/v1"
     fi
   else
-    echo "could not forward $role on localhost:${service_port}" >&2
+    echo "could not forward $role on ${bind_address}:${service_port}" >&2
   fi
 done <<<"$deployment_rows"
 

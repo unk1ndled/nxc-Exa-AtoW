@@ -1,0 +1,22 @@
+# Tinyproxy filter file one regex per line
+# Matched against the destination
+# host of every outbound request. With `FilterDefaultDeny Yes`, anything that does NOT match is rejected.
+# Every entry here is a network endpoint that user notebook code can reach.
+
+# Python package index
+^(.*\.)?pypi\.org$
+^files\.pythonhosted\.org$
+
+# HuggingFace (models + datasets)
+^(.*\.)?huggingface\.co$
+^cdn-lfs\.huggingface\.co$
+
+# Common scientific data sources — uncomment / add as the demo needs them
+# ^raw\.githubusercontent\.com$
+# ^(.*\.)?scikit-learn\.org$
+
+
+# eBuffer / ebservice API the notebooks call (default: forwarded to the host).
+# host.docker.internal resolves to the host gateway from inside the proxy,
+# which is started with extra_hosts=host-gateway in session_manager.py.
+^host\.docker\.internal$

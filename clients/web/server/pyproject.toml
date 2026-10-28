@@ -1,0 +1,15 @@
+[project]
+name = "exa-atow-server"
+version = "0.1.0"
+description = "Exa-AToW notebook server — manages Jupyter Docker sessions"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "docker>=7.1.0",
+    "fastapi>=0.136.1",
+    "httpx>=0.28.1",
+    "python-dotenv>=1.2.2",
+    "python-multipart>=0.0.20",
+    "uvicorn[standard]>=0.47.0",
+    "websockets>=16.0",
+]

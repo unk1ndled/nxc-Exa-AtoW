@@ -47,3 +47,9 @@ test composition="openqcd" application=composition: (tunnel composition)
 [script("bash")]
 g5k-e2e composition="openqcd" application=composition walltime="1:00:00" duration="1h":
     bash clients/python-e2e/g5k-e2e.sh {{ composition }} {{ application }} {{ walltime }} {{ duration }}
+web-install:
+    cd clients/web/webapp && bun install
+    e2e-fhs -c "uv sync --project clients/web/server"
+web-dev composition="openqcd":
+    TUNNEL_BIND_ADDRESS=$(docker network inspect bridge | jq -r '.[0].IPAM.Config[0].Gateway') bash scripts/tunnel.sh deploy/{{ composition }}::vm.json
+    (cd clients/web/webapp && bun run dev) & e2e-fhs -c "uv run --directory clients/web/server uvicorn main:app --port 9000"

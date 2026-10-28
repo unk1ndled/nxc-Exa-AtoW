@@ -17,8 +17,9 @@ command inside `nix develop`, so the justfile reads as plain `nix`, `nxc`, and
 
 | Command | Effect |
 | --- | --- |
-| `nix develop` | Enter the environment containing NXC, uv, jq, mdBook, and `e2e-fhs`. |
+| `nix develop` | Enter the environment containing NXC, uv, bun, jq, mdBook, and `e2e-fhs`. |
 | `just install` | Sync the locked Python dependencies into `clients/python-e2e/.venv`. |
+| `just web-install` | Install the locked web client dependencies (`clients/web/`). |
 
 ## Build and deployment
 
@@ -65,6 +66,15 @@ by an optional application; the application defaults to the composition name.
 `just nxc-test` starts its own topology. `just test` expects a matching
 `just up` process already running.
 
+## Web client
+
+| Command | Effect |
+| --- | --- |
+| `just web-dev` | Tunnel the APIs to the Docker bridge, then serve the webapp on `:5173` and its notebook server on `:9000`. |
+
+Like `just test`, it expects `just up` to be running. Docker must be available
+on the host; see `clients/web/README.md` for the firewall rule it needs.
+
 ## Generated state
 
 | Path | Producer | Purpose |
@@ -72,6 +82,7 @@ by an optional application; the application defaults to the composition name.
 | `build/<workload>::<flavour>.json` | `nxc build` | Description of the built composition. |
 | `deploy/<workload>::<flavour>.json` | `nxc start` | Role and VM deployment metadata used by the tunnel. |
 | `clients/python-e2e/.venv/` | `just install` | Locked host E2E environment. |
+| `clients/web/webapp/node_modules/`, `clients/web/server/.venv/` | `just web-install` | Web client environments. |
 | `docs/book/` | `just docs` | Generated static documentation. |
 | `/tmp/nxc-exa-atow-tunnels-$UID/` | tunnel script | SSH control sockets and selected deployment state. |
 

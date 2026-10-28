@@ -11,3 +11,9 @@ __pycache__/
 # remotemanager fallback-command files, if a process is interrupted.
 /clients/python-e2e/????????.sh
 *.log
+# Optional web client: dependencies, build output, and the experimenter
+# invite tokens its server writes (plaintext bearer credentials).
+/clients/web/webapp/node_modules/
+/clients/web/webapp/dist/
+/clients/web/server/experimenter_tokens.json
+/clients/web/server/.env

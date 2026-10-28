@@ -45,8 +45,10 @@ together, or on only some compute groups.
 │
 ├── clients/                  Exa-AToW infrastructure clients (web apps,
 │   │                         notebooks, ...); optional, nothing reads from here
-│   └── python-e2e/           Python client for the ebservice API path, with
-│                             its launch scripts
+│   ├── python-e2e/           Python client for the ebservice API path, with
+│   │                         its launch scripts
+│   └── web/                  React site + FastAPI server running notebooks
+│                             in sandboxed Docker kernels
 ├── scripts/                  Client-neutral helpers
 ├── docs/                     This book: book.toml, src/, generated book/
 └── justfile                  Commands used to build, run, and test
